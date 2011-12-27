@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <!--[if lt IE 9]>
+        <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+
+        <meta charset="utf-8">
+        <title>DayNightOverlay Parameter example</title>
+        <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+        <script type="text/javascript" src="../src/daynightoverlay.js"></script>
+        <script>
+            function init() {
+                var mapObj = new google.maps.Map(document.getElementById('map'), {
+                    zoom:1,
+                    center: new google.maps.LatLng(0,0),
+                    mapTypeId: google.maps.MapTypeId.ROADMAP
+                });
+
+                new DayNightOverlay({
+                    map: mapObj,
+                    fillColor: 'rgba(200,0,0,0.3)',
+                    date: new Date(Date.UTC(2011,0,1,12,00))
+                });
+            }
+        </script>
+        <style>
+            pre {
+                background-color:#efefef;
+                padding:10px;
+                border:1px solid #ccc;
+                line-height:1.5em;
+                width:600px;
+            }
+        </style>
+    </head>
+    
+    <body onload="init()">
+        <div id="map" style="width:620px; height:500px"></div>
+        <pre>
+var mapObj = new google.maps.Map(document.getElementById('map'), {
+    zoom:1,
+    center: new google.maps.LatLng(0,0),
+    mapTypeId: google.maps.MapTypeId.ROADMAP
+});
+
+new DayNightOverlay({
+    map: mapObj,
+    fillColor: 'rgba(200,0,0,0.3)',
+    date: new Date(Date.UTC(2011,0,1,12,00))
+});
+        </pre>
+    </body>
+</html>
