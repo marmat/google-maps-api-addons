@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!--[if lt IE 9]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <meta charset="utf-8">
+    <title>SimpleMarker Demo Site</title>
+    <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+    <script type="text/javascript" src="../src/simplemarker.js"></script>
+    <script type="text/javascript">
+      function init() {
+        // create the basic map
+        var jMap = new google.maps.Map(
+          document.getElementById('map'),
+          {
+            zoom: 12,
+            center: new google.maps.LatLng(50.7658, 6.1059),
+            mapTypeId: google.maps.MapTypeId.ROADMAP
+          }
+        );
+        
+        // create a simple marker with the default appearance
+        new SimpleMarker(jMap, new google.maps.LatLng(50.7658, 6.1059));
+        
+        // create a simple marker with custom appearance
+        var marker = new SimpleMarker(
+          jMap,
+          new google.maps.LatLng(50.7572, 6.1453),
+          {
+            id: 'myMarker',
+            image: 'greendot.png',
+            dimension: new google.maps.Size(48,48),
+            anchor: new google.maps.Point(24,24),
+            title: 'Simple, isn\'t it?'  
+          }
+        );
+        
+        // you can also add a click listener as usual
+        google.maps.event.addListener(marker, 'click', function() {
+          alert("Hello, SimpleMarker!\nMy bounds are: " + 
+              this.getBounds().toString() + 
+              "\nIf you change the zoom, the bounds will, too!"
+          );
+        });
+      }
+    </script>
+    <style>
+      pre {
+        background-color:#efefef;
+        padding:10px;
+        border:1px solid #ccc;
+        line-height:1.5em;
+        width:600px;
+      }
+    </style>
+  </head>
+  
+  <body onload="init()">
+    <div id="map" style="width:620px; height:500px"></div>
+    <pre>
+// create the basic map
+var jMap = new google.maps.Map(
+  document.getElementById('map'),
+  {
+    zoom: 12,
+    center: new google.maps.LatLng(50.7658, 6.1059),
+    mapTypeId: google.maps.MapTypeId.ROADMAP
+  }
+);
+
+// create a simple marker with the default appearance
+new SimpleMarker(jMap, new google.maps.LatLng(50.7658, 6.1059));
+
+// create a simple marker with custom appearance
+var marker = new SimpleMarker(
+  jMap,
+  new google.maps.LatLng(50.7572, 6.1453),
+  {
+    id: 'myMarker',
+    image: 'greendot.png',
+    dimension: new google.maps.Size(48,48),
+    anchor: new google.maps.Point(24,24),
+    title: 'Simple, isn\'t it?'  
+  }
+);
+
+// you can also add a click listener as usual
+google.maps.event.addListener(marker, 'click', function() {
+  alert("Hello, SimpleMarker!\nMy bounds are: " + 
+      this.getBounds().toString() + 
+      "\nIf you change the zoom, the bounds will, too!"
+  );
+});
+    </pre>
+  </body>
+</html>

@@ -14,7 +14,13 @@ Contents
 
 Here is a short overview of classes that are available in this repository.
 
-### DayNightOverlay
+#### DayNightOverlay
 
 This class provides a custom overlay which shows an approximation of where 
 the day/night line runs at any given date.
+
+#### SimpleMarker
+
+An extremely lightweight marker class. The marker is trimmed down to the very
+basic needs of a marker. In the DOM hierarchy, the marker is represented by a
+single `div`-node.
