@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!--[if lt IE 9]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <meta charset="utf-8">
+    <title>SimpleMarker extended examples</title>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>
+    <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+    <script type="text/javascript" src="../src/simplemarker.js"></script>
+    <script type="text/javascript">
+      function init() {
+        // create the basic map
+        var maps = [];
+
+        for (var i = 1; i <= 3; i++) {
+          var mapObj = new google.maps.Map(
+            document.getElementById('map' + i),
+            {
+              zoom: 12,
+              center: new google.maps.LatLng(50.7572, 6.1453),
+              mapTypeId: google.maps.MapTypeId.ROADMAP
+            }
+          );
+        
+          maps.push(mapObj);
+        }
+        
+        // Example 1: minimal constructor parameters
+        var ex1 = new SimpleMarker({
+          position: new google.maps.LatLng(50.7572, 6.1453)
+        });
+
+        // The rest can be done through setter methods
+        ex1.setMap(maps[0]);
+
+
+        // Example 2: using CSS to style the marker
+        new SimpleMarker({
+          map: maps[1],
+          position: new google.maps.LatLng(50.7572, 6.1453),
+          className: 'ex2'
+        });
+
+
+        // Example 3: use methods to influence the marker after creation
+        var ex3 = new SimpleMarker({
+          map: maps[2],
+          position: new google.maps.LatLng(50.7572, 6.1453)
+        })
+
+        // I use jQuery to attach the events, but you can do that in any way
+        // you like
+        $('#ex3_visible').click(function() {
+          ex3.setVisible(!ex3.getVisible());
+        });
+
+        $('#ex3_right').click(function() {
+          var currentPos = ex3.getPosition();
+
+          ex3.setPosition(
+            new google.maps.LatLng(
+              currentPos.lat(),
+              currentPos.lng() + 0.001
+            )
+          );
+        });
+
+      }
+    </script>
+    <style>
+      .ex2 {
+        width: 16px !important; /** use !important if you don't want */
+        height: 16px !important; /** to specify the 'size' parameter */
+        background-color: #F00;
+        border: 5px solid #00F;
+        border-radius: 15px;
+      }
+
+      pre {
+        background-color:#efefef;
+        padding:10px;
+        border:1px solid #ccc;
+        line-height:1.5em;
+        width:600px;
+      }
+    </style>
+  </head>
+  
+  <body onload="init()">
+    <div id="map1" style="width:620px; height:200px"></div>
+    <pre>
+// Example 1: minimal constructor parameters
+var ex1 = new SimpleMarker({
+  position: new google.maps.LatLng(50.7572, 6.1453)
+});
+
+// The rest can be done through setter methods
+ex1.setMap(maps[0]);
+    </pre>    
+    <div id="map2" style="width:620px; height:200px"></div>
+    <pre>
+// Example 2: using CSS to style the marker
+new SimpleMarker({
+  map: maps[1],
+  position: new google.maps.LatLng(50.7572, 6.1453),
+  className: 'ex2'
+});
+    </pre>
+
+    <pre>
+The CSS class:
+.ex2 {
+  width: 16px !important; /** use !important if you don't want */
+  height: 16px !important; /** to specify the 'size' parameter */
+  background-color: #F00;
+  border: 5px solid #00F;
+  border-radius: 15px;
+}
+    </pre>
+    <div id="map3" style="width:620px; height:200px"></div>
+    <button id="ex3_visible">Toggle visibility</button>
+    <button id="ex3_right">Move right</button>
+    <pre>
+// Example 3: use methods to influence the marker after creation
+var ex3 = new SimpleMarker({
+  map: maps[2],
+  position: new google.maps.LatLng(50.7572, 6.1453)
+})
+
+// I use jQuery to attach the events, but you can
+// do that in any way you like
+$('#ex3_visible').click(function() {
+  ex3.setVisible(!ex3.getVisible());
+});
+
+$('#ex3_right').click(function() {
+  var currentPos = ex3.getPosition();
+
+  ex3.setPosition(
+    new google.maps.LatLng(
+      currentPos.lat(),
+      currentPos.lng() + 0.001
+    )
+  );
+});
+    </pre>
+  </body>
+</html>
