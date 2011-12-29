@@ -12,7 +12,7 @@
     <script type="text/javascript">
       function init() {
         // create the basic map
-        var jMap = new google.maps.Map(
+        var mapObj = new google.maps.Map(
           document.getElementById('map'),
           {
             zoom: 12,
@@ -22,20 +22,21 @@
         );
         
         // create a simple marker with the default appearance
-        new SimpleMarker(jMap, new google.maps.LatLng(50.7658, 6.1059));
+        new SimpleMarker({
+          map: mapObj,
+          position: new google.maps.LatLng(50.7658, 6.1059)
+        });
         
         // create a simple marker with custom appearance
-        var marker = new SimpleMarker(
-          jMap,
-          new google.maps.LatLng(50.7572, 6.1453),
-          {
-            id: 'myMarker',
-            image: 'greendot.png',
-            dimension: new google.maps.Size(48,48),
-            anchor: new google.maps.Point(24,24),
-            title: 'Simple, isn\'t it?'  
-          }
-        );
+        var marker = new SimpleMarker({
+          map: mapObj,
+          position: new google.maps.LatLng(50.7572, 6.1453),
+          id: 'myMarker',
+          icon: 'greendot.png',
+          size: new google.maps.Size(48,48),
+          anchor: new google.maps.Point(24,24),
+          title: 'Simple, isn\'t it?'  
+        });
         
         // you can also add a click listener as usual
         google.maps.event.addListener(marker, 'click', function() {
@@ -61,7 +62,7 @@
     <div id="map" style="width:620px; height:500px"></div>
     <pre>
 // create the basic map
-var jMap = new google.maps.Map(
+var mapObj = new google.maps.Map(
   document.getElementById('map'),
   {
     zoom: 12,
@@ -71,20 +72,21 @@ var jMap = new google.maps.Map(
 );
 
 // create a simple marker with the default appearance
-new SimpleMarker(jMap, new google.maps.LatLng(50.7658, 6.1059));
+new SimpleMarker({
+  map: mapObj,
+  position: new google.maps.LatLng(50.7658, 6.1059)
+});
 
 // create a simple marker with custom appearance
-var marker = new SimpleMarker(
-  jMap,
-  new google.maps.LatLng(50.7572, 6.1453),
-  {
-    id: 'myMarker',
-    image: 'greendot.png',
-    dimension: new google.maps.Size(48,48),
-    anchor: new google.maps.Point(24,24),
-    title: 'Simple, isn\'t it?'  
-  }
-);
+var marker = new SimpleMarker({
+  map: mapObj,
+  position: new google.maps.LatLng(50.7572, 6.1453),
+  id: 'myMarker',
+  icon: 'greendot.png',
+  size: new google.maps.Size(48,48),
+  anchor: new google.maps.Point(24,24),
+  title: 'Simple, isn\'t it?'  
+});
 
 // you can also add a click listener as usual
 google.maps.event.addListener(marker, 'click', function() {
