@@ -1,7 +1,7 @@
 
 /**
  * Day/Night Overlay
- * Version 1.1a
+ * Version 1.2
  *
  * @author kaktus621@gmail.com (Martin Matysiak)
  * @fileoverview This class provides a custom overlay which shows an
@@ -108,7 +108,7 @@ DayNightOverlay.prototype = new google.maps.OverlayView();
  * over 85 degrees result in a strange bug where the calculated pixel
  * coordinates are _way_ outside the map. Therefore I use latitudes of +-85
  * degrees which result in being placed very close to the visible borders
- * of the map.
+ * of the map. I suppose this behaviour has to do with the mecrator projection.
  *
  * @type {google.maps.LatLng}
  * @private
@@ -197,6 +197,18 @@ DayNightOverlay.prototype.draw = function() {
 
 
 /**
+ * Setter for date_.
+ *
+ * @param {?Date} date A specific point of time for which the day/night-
+ * overview shall be calculated (UTC date is taken) or null if the current
+ * time shall be taken.
+ */
+DayNightOverlay.prototype.setDate = function(date) {
+  this.date_ = date;
+};
+
+
+/**
  * Returns the coordinates of the world map, based on the current maps view.
  *
  * @private
@@ -256,7 +268,7 @@ DayNightOverlay.prototype.getVisibleDimensions_ = function(projection, margin) {
  * of the current viewport).
  *
  * If you don't like mathematics, feel free to skip this code ;-) It's roughly
- * based on http://goo.gl/zUm1Z
+ * based on http://www.geoastro.de/map/index.html
  *
  * This version uses a lot of variables to make the calculation a bit more
  * understandable. You might want to inline them in a minified version.
@@ -293,7 +305,7 @@ DayNightOverlay.prototype.createTerminatorFunc_ = function(viewport, world) {
   // onto the range of [0, 2*PI)
   var X_SCALE = TWO_PI / WORLD_WIDTH;
 
-  // Used for scaling the output of the crazy function below ([-PI/2, PI/2]) to 
+  // Used for scaling the output of the crazy function below ([-PI/2, PI/2]) to
   // the range of the world's height ([-world.height/2, world.height/2])
   var Y_SCALE = WORLD_HEIGHT / Math.PI;
 
@@ -338,13 +350,13 @@ DayNightOverlay.prototype.createTerminatorFunc_ = function(viewport, world) {
   // The returned method first translates the viewport x to world x,
   // calculates the world y and translates it back to the viewport y
   return function(x) {
-    // x in range [visible.x, visible.x + visible_width]
+    // x in range [0, visible_width]
 
     // World x in the range [0, 2PI) ("longitude")
     var worldX = (x + WORLD_OFFSET_X) * X_SCALE + TIME_OFFSET_X;
 
     // World y in the range [-PI/2, PI/2] ("latitude")
-    // This is the main function for calculating the terminator line !!
+    // This is the main function for calculating the terminator line!!
     var worldY = Math.atan(-Math.cos(worldX) / Math.tan(DECLINATION));
 
     // Translate to range [0, world_height]
