@@ -1,7 +1,7 @@
 
 /**
  * Day/Night Overlay
- * Version 1.0
+ * Version 1.1a
  *
  * @author kaktus621@gmail.com (Martin Matysiak)
  * @fileoverview This class provides a custom overlay which shows an
@@ -278,6 +278,7 @@ DayNightOverlay.prototype.createTerminatorFunc_ = function(viewport, world) {
 
   var WORLD_WIDTH = world.width;
   var WORLD_HEIGHT = world.height;
+  var HALF_WORLD_HEIGHT = world.height / 2;
 
   var VISIBLE_WIDTH = viewport.width;
   var VISIBLE_HEIGHT = viewport.height;
@@ -292,9 +293,9 @@ DayNightOverlay.prototype.createTerminatorFunc_ = function(viewport, world) {
   // onto the range of [0, 2*PI)
   var X_SCALE = TWO_PI / WORLD_WIDTH;
 
-  // Used for scaling the output of the (co)sine function ([-1, 1]) to the
-  // range of the world's height ([0, world.height])
-  var Y_SCALE = WORLD_HEIGHT / 2;
+  // Used for scaling the output of the crazy function below ([-PI/2, PI/2]) to 
+  // the range of the world's height ([-world.height/2, world.height/2])
+  var Y_SCALE = WORLD_HEIGHT / Math.PI;
 
 
   // Offset calculation
@@ -330,25 +331,27 @@ DayNightOverlay.prototype.createTerminatorFunc_ = function(viewport, world) {
   var DAY_OF_YEAR = this.getDayOfYear_(date);
   var VERNAL_EQUINOX = this.getDayOfYear_(new Date(date.getFullYear(), 2, 20));
 
-  // We transform the maximum offset directly to the pixel value on world
-  // dimension scope.
-  var MAX_ECLIPTIC_PX = WORLD_HEIGHT / 180 * 23.44;
+  var MAX_DECLINATION = 23.44 * Math.PI / 90;
+  var DECLINATION = Math.sin(TWO_PI * (DAY_OF_YEAR - VERNAL_EQUINOX) / 365) *
+      MAX_DECLINATION;
 
-  // And now we're adding everything together again.
-  var TIME_OFFSET_Y = Math.sin(TWO_PI * (DAY_OF_YEAR - VERNAL_EQUINOX) / 365) *
-      MAX_ECLIPTIC_PX;
-
+  // The returned method first translates the viewport x to world x,
+  // calculates the world y and translates it back to the viewport y
   return function(x) {
-    // WARNING: UGLY CODE AHEAD (TODO)
-    var result =
-        (
-         1 +
-         Math.cos(TIME_OFFSET_X + (x + WORLD_OFFSET_X) * X_SCALE)
-        ) * Y_SCALE -
-        WORLD_OFFSET_Y + TIME_OFFSET_Y;
+    // x in range [visible.x, visible.x + visible_width]
 
-    // Cap the calculated value to the bounds the area
-    return Math.min(VISIBLE_HEIGHT, Math.max(0, result));
+    // World x in the range [0, 2PI) ("longitude")
+    var worldX = (x + WORLD_OFFSET_X) * X_SCALE + TIME_OFFSET_X;
+
+    // World y in the range [-PI/2, PI/2] ("latitude")
+    // This is the main function for calculating the terminator line !!
+    var worldY = Math.atan(-Math.cos(worldX) / Math.tan(DECLINATION));
+
+    // Translate to range [0, world_height]
+    worldY = HALF_WORLD_HEIGHT + worldY * Y_SCALE;
+
+    // Crop to visible range
+    return Math.min(VISIBLE_HEIGHT, Math.max(0, worldY - WORLD_OFFSET_Y));
   };
 };
 
