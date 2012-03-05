@@ -180,8 +180,7 @@ DayNightOverlay.prototype.draw = function() {
   var ctx = this.canvas_.getContext('2d');
   ctx.clearRect(0, 0, visibleDim.width, visibleDim.height);
 
-  // Redraw the sine wave which approximately describes where
-  // it's currently night
+  // Redraw the wave which approximately describes where it's currently night
   var terminator = this.createTerminatorFunc_(visibleDim, worldDim);
   var northernSun = this.isNorthernSun_(this.date_ ? this.date_ : new Date());
 
@@ -205,6 +204,11 @@ DayNightOverlay.prototype.draw = function() {
  */
 DayNightOverlay.prototype.setDate = function(date) {
   this.date_ = date;
+
+  // Redraw the line if we're added to a maps canvas
+  if (this.canvas_ !== null) {
+    this.draw();
+  }
 };
 
 
@@ -320,8 +324,6 @@ DayNightOverlay.prototype.createTerminatorFunc_ = function(viewport, world) {
   // Since the world's borders are at longitude +-180 degrees but we are
   // are comparing to UTC time (which takes place at longitude 0 degrees),
   // we have to shift the time by exactly 12 hours using NOON_SECS.
-  // Yes, we could also use the negative cosine value, but we have to add a
-  // time offset anyways.
   var NOON_SECS = 86400 / 2;
 
   // We calculate the horizontal offset on the basis of seconds. Therefore we
@@ -341,7 +343,9 @@ DayNightOverlay.prototype.createTerminatorFunc_ = function(viewport, world) {
   // The first thing we do is calculating the sun's position by using the
   // vernal equinox as a reference point.
   var DAY_OF_YEAR = this.getDayOfYear_(date);
-  var VERNAL_EQUINOX = this.getDayOfYear_(new Date(date.getFullYear(), 2, 20));
+  var VERNAL_EQUINOX = this.getDayOfYear_(
+      new Date(Date.UTC(date.getFullYear(), 2, 20))
+      );
 
   var MAX_DECLINATION = 23.44 * Math.PI / 90;
   var DECLINATION = Math.sin(TWO_PI * (DAY_OF_YEAR - VERNAL_EQUINOX) / 365) *
@@ -378,10 +382,10 @@ DayNightOverlay.prototype.createTerminatorFunc_ = function(viewport, world) {
  * otherwise.
  */
 DayNightOverlay.prototype.isNorthernSun_ = function(date) {
-  var vernalEq = new Date(date.getFullYear(), 2, 20);
-  var autumnalEq = new Date(date.getFullYear(), 8, 22);
+  var vernalEq = new Date(Date.UTC(date.getFullYear(), 2, 19));
+  var autumnalEq = new Date(Date.UTC(date.getFullYear(), 8, 18));
 
-  return (date.getTime() >= vernalEq.getTime()) &&
+  return (date.getTime() > vernalEq.getTime()) &&
       (date.getTime() <= autumnalEq.getTime());
 };
 
@@ -398,7 +402,7 @@ DayNightOverlay.prototype.isNorthernSun_ = function(date) {
  */
 DayNightOverlay.prototype.getDayOfYear_ = function(date) {
   // Yes, the month has to be zero thanks to JavaScript's great Date class.....
-  var firstDay = new Date(date.getFullYear(), 0, 1);
+  var firstDay = new Date(Date.UTC(date.getFullYear(), 0, 1));
 
   return Math.ceil((date.getTime() - firstDay.getTime()) / 86400000);
 };
