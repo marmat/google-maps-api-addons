@@ -17,11 +17,25 @@
                     mapTypeId: google.maps.MapTypeId.ROADMAP
                 });
 
-                new DayNightOverlay({
+                window.dno = new DayNightOverlay({
                     map: mapObj,
                     fillColor: 'rgba(200,0,0,0.3)',
-                    date: new Date(Date.UTC(2011,0,1,12,00))
+                    date: new Date(Date.UTC(2011,0,1))
                 });
+
+                window.dateField = document.getElementById('date');
+            }
+
+            function simulate(from, to, step, time) {
+                if (from < to) {
+                    from.setTime(from.getTime() + step);
+                    dateField.innerHTML = from.getUTCDate() + '.' + 
+                        (from.getUTCMonth() + 1) + '.' + 
+                        from.getUTCFullYear() + ' - 00:00 UTC';
+
+                    dno.setDate(from);
+                    setTimeout(function() { simulate(from, to, step); }, time);
+                }
             }
         </script>
         <style>
@@ -32,11 +46,31 @@
                 line-height:1.5em;
                 width:600px;
             }
+
+            button {
+                margin:15px 0 0;
+            }
+
+            #dateWrap {
+                position:absolute;
+                display: block;
+                left:400px;
+                width:200px;
+                text-align:right;
+            }
+
+            #date {
+                text-align:right;
+                font-family:sans-serif;
+                font-weight:bold;
+            }
         </style>
     </head>
     
     <body onload="init()">
         <div id="map" style="width:620px; height:500px"></div>
+        <div id="dateWrap"><p id="date">01.01.2012 - 00:00 UTC</p></div>
+        <button onclick="simulate(new Date(Date.UTC(2012,0,1)), new Date(Date.UTC(2012,11,31)), 86400000, 100)">Simulate a Year</button>
         <pre>
 var mapObj = new google.maps.Map(document.getElementById('map'), {
     zoom:1,
@@ -47,7 +81,7 @@ var mapObj = new google.maps.Map(document.getElementById('map'), {
 new DayNightOverlay({
     map: mapObj,
     fillColor: 'rgba(200,0,0,0.3)',
-    date: new Date(Date.UTC(2011,0,1,12,00))
+    date: new Date(Date.UTC(2012,0,1))
 });
         </pre>
     </body>

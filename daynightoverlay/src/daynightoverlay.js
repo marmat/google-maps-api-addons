@@ -1,7 +1,7 @@
 
 /**
  * Day/Night Overlay
- * Version 1.2
+ * Version 1.3
  *
  * @author kaktus621@gmail.com (Martin Matysiak)
  * @fileoverview This class provides a custom overlay which shows an
@@ -9,7 +9,7 @@
  */
 
 /**
- * @license Copyright 2011 Martin Matysiak.
+ * @license Copyright 2011-2012 Martin Matysiak.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
