@@ -132,11 +132,20 @@ PanoMarker.povToPixel = function(targetPov, currentPov, viewport) {
   };
 
   var currentFov = PanoMarker.getFov(currentPov.zoom);
-  var linearHorizPxPerDegree = viewport.offsetWidth / currentFov;
-  var linearVertPxPerDegree = viewport.offsetHeight / currentFov;
+  var DEG_TO_RAD = Math.PI / 180;
 
-  target.left += (targetPov.heading - currentPov.heading) * linearHorizPxPerDegree;
-  target.top -= (targetPov.pitch - currentPov.pitch) * linearVertPxPerDegree;
+  // Approach: we calculate the distance y of the POV from the image plane
+  //   and then use the angular offset delta from current to target in order
+  //   to calculate the position x where a ray from point POV with angle delta
+  //   would intersect the image plane.
+
+  var povDistance = viewport.offsetWidth /
+      (2 * Math.tan(currentFov / 2 * DEG_TO_RAD));
+  var deltaH = targetPov.heading - currentPov.heading;
+  var deltaV = targetPov.pitch - currentPov.pitch;
+
+  target.left += povDistance * Math.tan(deltaH * DEG_TO_RAD);
+  target.top -= povDistance * Math.tan(deltaV * DEG_TO_RAD);
 
   return target;
 };
