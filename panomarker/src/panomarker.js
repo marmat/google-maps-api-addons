@@ -118,6 +118,10 @@ PanoMarker.getFov = function(zoom) {
 
 
 /**
+ * Given the current POV, this method calculates the Pixel coordinates on the
+ * given viewport for the desired POV. All credit for the math this method goes
+ * to user3146587 on StackOverflow: http://goo.gl/0GGKi6
+ *
  * @param {StreetViewPov} targetPov The point-of-view whose coordinates are
  *     requested.
  * @param {StreetViewPov} currentPov POV of the viewport center.
@@ -126,28 +130,82 @@ PanoMarker.getFov = function(zoom) {
  *     the desired point-of-view.
  */
 PanoMarker.povToPixel = function(targetPov, currentPov, viewport) {
-  var target = {
-    left: viewport.offsetWidth / 2,
-    top: viewport.offsetHeight / 2
-  };
 
-  var currentFov = PanoMarker.getFov(currentPov.zoom);
-  var DEG_TO_RAD = Math.PI / 180;
+    // Gather required variables and convert to radians where necessary
+    var width = viewport.offsetWidth;
+    var height = viewport.offsetHeight;
+    var target = {
+      left: width / 2,
+      top: height / 2
+    };
 
-  // Approach: we calculate the distance y of the POV from the image plane
-  //   and then use the angular offset delta from current to target in order
-  //   to calculate the position x where a ray from point POV with angle delta
-  //   would intersect the image plane.
+    var DEG_TO_RAD = Math.PI / 180.0;
+    var fov = PanoMarker.getFov(currentPov.zoom) * DEG_TO_RAD;
+    var h0 = currentPov.heading * DEG_TO_RAD;
+    var p0 = currentPov.pitch * DEG_TO_RAD;
+    var h = targetPov.heading * DEG_TO_RAD;
+    var p = targetPov.pitch * DEG_TO_RAD;
 
-  var povDistance = viewport.offsetWidth /
-      (2 * Math.tan(currentFov / 2 * DEG_TO_RAD));
-  var deltaH = targetPov.heading - currentPov.heading;
-  var deltaV = targetPov.pitch - currentPov.pitch;
+    // f = focal length = distance of current POV to image plane
+    var f = (width / 2) / Math.tan(fov / 2);
 
-  target.left += povDistance * Math.tan(deltaH * DEG_TO_RAD);
-  target.top -= povDistance * Math.tan(deltaV * DEG_TO_RAD);
+    var cos_p = Math.cos(p);
+    var sin_p = Math.sin(p);
 
-  return target;
+    var cos_h = Math.cos(h);
+    var sin_h = Math.sin(h);
+
+    var x = f * cos_p * sin_h;
+    var z = f * sin_p;
+    var y = f * cos_p * cos_h;
+
+    var cos_p0 = Math.cos(p0);
+    var sin_p0 = Math.sin(p0);
+
+    var cos_h0 = Math.cos(h0);
+    var sin_h0 = Math.sin(h0);
+
+    var x0 = f * cos_p0 * sin_h0;
+    var z0 = f * sin_p0;
+    var y0 = f * cos_p0 * cos_h0;
+
+    var nDotD = x0 * x + y0 * y + z0 * z;
+    var nDotC = x0 * x0 + y0 * y0 + z0 * z0;
+
+    // Sanity checks
+    if (Math.abs(nDotD) < 1e-6) {
+      return null;
+    }
+
+    var t = nDotC / nDotD;
+
+    if (t < 0.0) {
+      return null;
+    }
+
+    var tx = t * x;
+    var ty = t * y;
+    var tz = t * z;
+
+    var vx = -sin_p0 * sin_h0;
+    var vy = -sin_p0 * cos_h0;
+    var vz =  cos_p0;
+
+    var ux =  cos_p0 * cos_h0;
+    var uy = -cos_p0 * sin_h0;
+    var uz = 0;
+
+    var ul = Math.sqrt(ux * ux + uy * uy + uz * uz);
+    ux /= ul;
+    uy /= ul;
+    uz /= ul;
+
+    var du = tx * ux + ty * uy + tz * uz;
+    var dv = tx * vx + ty * vy + tz * vz;
+
+    target.left += du;
+    target.top -= dv;
+    return target;
 };
 
 
