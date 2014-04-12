@@ -268,7 +268,7 @@ PanoMarker.prototype.draw = function() {
       this.pano_.getPov(),
       this.pano_.getContainer());
 
-  if( offset !== null ){
+  if (offset !== null) {
     this.marker_.style.left = (offset.left - this.anchor_.x) + 'px';
     this.marker_.style.top = (offset.top - this.anchor_.y) + 'px';
   }
