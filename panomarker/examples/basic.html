@@ -5,11 +5,13 @@
     <title>PanoMarker</title>
     <meta charset="utf-8">
     <style>
-      html, body, #map-canvas {
-        height: 100%;
-        margin: 0px;
-        padding: 0px
-      }
+        pre {
+            background-color:#efefef;
+            padding:10px;
+            border:1px solid #ccc;
+            line-height:1.5em;
+            width:600px;
+        }
     </style>
     <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&amp;sensor=false"></script>
     <script src="../src/panomarker.js"></script>
@@ -46,27 +48,38 @@ var AVAILABLE_PANORAMAS = {
   }
 };
 
-function initialize() {
-  var panoOptions = {
-    pano: 'grid',
-    visible: true,
-    panoProvider: function(pano) { return AVAILABLE_PANORAMAS[pano]; }
-  };
+function init() {
+  var panorama = new google.maps.StreetViewPanorama(
+    document.getElementById('map'),
+    {
+      pano: 'grid',
+      panoProvider: function(pano) { return AVAILABLE_PANORAMAS[pano]; }
+    });
 
-  window.panorama = new google.maps.StreetViewPanorama(
-    document.getElementById('map-canvas'), panoOptions);
-
-  window.marker = new PanoMarker({
-      pano: window.panorama,
+  var marker = new PanoMarker(
+    {
+      pano: panorama,
       anchor: new google.maps.Point(16,32)
     });
 }
 
-google.maps.event.addDomListener(window, 'load', initialize);
-
     </script>
   </head>
-  <body>
-    <div id="map-canvas"></div>
-  </body>
+    <body onload="init()">
+        <div id="map" style="width:620px; height:500px"></div>
+        <pre>
+var panorama = new google.maps.StreetViewPanorama(
+  document.getElementById('map'),
+  {
+    pano: 'grid',
+    panoProvider: function(pano) { return AVAILABLE_PANORAMAS[pano]; }
+  });
+
+var marker = new PanoMarker(
+  {
+    pano: panorama,
+    anchor: new google.maps.Point(16,32)
+  });
+        </pre>
+    </body>
 </html>
