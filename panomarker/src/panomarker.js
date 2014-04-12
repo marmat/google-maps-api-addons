@@ -234,6 +234,9 @@ PanoMarker.prototype.create_ = function() {
   }
 
   this.marker_ = marker;
+
+  // Attach to some global events
+  window.addEventListener('resize', this.draw.bind(this));
 };
 
 
