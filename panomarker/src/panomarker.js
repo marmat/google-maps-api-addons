@@ -107,13 +107,31 @@ var PanoMarker = function(opts) {
 
 
 /**
- * @return {number} The (horizontal) field of views for the supported zoom
- *     levels. The documentation provides values for integral zoom levels,
- *     intermediate levels have to be interpolated, but they seem to follow a
- *     logarithmic curve.
+ * According to the documentation (goo.gl/WT4B57), the field-of-view angle
+ * should precisely follow the curve of the form 180/2^zoom. Unfortunately, this
+ * is not the case in practice. From experiments, the following FOVs seem to be
+ * more correct:
+ *
+ *        Zoom | best FOV | documented FOV
+ *       ------+----------+----------------
+ *          0  | 126.5    | 180
+ *          1  | 90       | 90
+ *          2  | 53       | 45
+ *          3  | 28       | 22.5
+ *          4  | 14.25    | 11.25
+ *          5  | 7.25     | not specified
+ *
+ * Because of this, we are doing a linear interpolation for zoom values <= 2 and
+ * then switch over to an inverse exponential. In practice, the produced
+ * values are good enough to result in stable marker positioning, even for
+ * intermediate zoom values.
+ *
+ * @return {number} The (horizontal) field of view angle for the given zoom.
  */
 PanoMarker.getFov = function(zoom) {
-  return 180.0 / Math.pow(2, zoom);
+  return zoom <= 2 ?
+      126.5 - zoom * 36.75 :  // linear descent
+      195.93 / Math.pow(1.92, zoom); // parameters determined experimentally
 };
 
 
