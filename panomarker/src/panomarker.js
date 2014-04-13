@@ -175,7 +175,7 @@ PanoMarker.povToPixel = function(targetPov, currentPov, viewport) {
     };
 
     var DEG_TO_RAD = Math.PI / 180.0;
-    var fov = PanoMarker.getFov(currentPov.zoom) * DEG_TO_RAD;
+    var fov = PanoMarker.getFov(currentPov.zoom || 1) * DEG_TO_RAD;
     var h0 = currentPov.heading * DEG_TO_RAD;
     var p0 = currentPov.pitch * DEG_TO_RAD;
     var h = targetPov.heading * DEG_TO_RAD;

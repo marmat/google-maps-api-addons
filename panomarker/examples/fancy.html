@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- Example code adapted from goo.gl/uEx309 -->
+    <title>PanoMarker</title>
+    <meta charset="utf-8">
+    <style>
+        pre {
+            background-color:#efefef;
+            padding:10px;
+            border:1px solid #ccc;
+            line-height:1.5em;
+            width:600px;
+        }
+    </style>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&amp;sensor=false"></script>
+    <script src="../src/panomarker.js"></script>
+    <script>
+
+var AVAILABLE_PANORAMAS = {
+  grid: {
+    location: {
+      pano: 'grid',
+      description: 'A simple test grid'
+    },
+    links: [],
+    copyright: 'Imagery (c) Martin Matysiak',
+    tiles: {
+      tileSize: new google.maps.Size(2000, 1000),
+      worldSize: new google.maps.Size(2000, 1000),
+      centerHeading: 0,
+      getTileUrl: function() { return 'grid.png' }
+    }
+  },
+  gileppe: {
+    location: {
+      pano: 'gileppe',
+      description: 'Lac de la Gileppe'
+    },
+    links: [],
+    copyright: 'Imagery (c) Martin Matysiak',
+    tiles: {
+      tileSize: new google.maps.Size(4000, 2000),
+      worldSize: new google.maps.Size(4000, 2000),
+      centerHeading: 0,
+      getTileUrl: function() { return 'gileppe.jpg' }
+    }
+  }
+};
+
+function init() {
+  window.panorama = new google.maps.StreetViewPanorama(
+    document.getElementById('map'),
+    {
+      pano: 'gileppe',
+      pov: {heading: 47.11, pitch: -13.1},
+      panoProvider: function(pano) { return AVAILABLE_PANORAMAS[pano]; }
+    });
+
+  window.marker = new PanoMarker(
+    {
+      pano: panorama,
+      position: {heading: 89.63, pitch: -27.22},
+      anchor: new google.maps.Point(20,20),
+      size: new google.maps.Size(40,40),
+      icon: 'info.png',
+      title: 'Click me!'
+    });
+
+  google.maps.event.addListener(marker, 'click', function() {
+    alert('That\'s my bike!');
+  });
+}
+
+    </script>
+  </head>
+    <body onload="init()">
+        <div id="map" style="width:620px; height:500px"></div>
+        <pre>
+var panorama = new google.maps.StreetViewPanorama(
+  document.getElementById('map'),
+  {
+    pano: 'gileppe',
+    pov: {heading: 47.11, pitch: -13.1},
+    panoProvider: function(pano) { return AVAILABLE_PANORAMAS[pano]; }
+  });
+
+var marker = new PanoMarker(
+  {
+    pano: panorama,
+    position: {heading: 89.63, pitch: -27.22},
+    anchor: new google.maps.Point(20,20),
+    size: new google.maps.Size(40,40),
+    icon: 'info.png',
+    title: 'Click me!'
+  });
+
+google.maps.event.addListener(marker, 'click', function() {
+  alert('That\'s my bike!');
+});
+        </pre>
+    </body>
+</html>
