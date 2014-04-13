@@ -37,20 +37,18 @@
 /**
  * PanoMarkerOptions
  *
- * Please note that some parameters are required! If those are not specified,
- * an error will be thrown.
- *
- * {google.maps.StreetViewPanorama} pano Panorama in which to display marker.
- * {google.maps.StreetViewPov} position Marker position.
- * {string} id A unique identifier that will be assigned to the
- *    created div-node.
+ * {google.maps.Point} anchor The point (in pixels) to which objects will snap.
  * {string} className The class name which will be assigned to the
  *    created div node.
  * {string} icon URL to an image file that shall be used.
+ * {string} id A unique identifier that will be assigned to the
+ *    created div-node.
+ * {google.maps.StreetViewPanorama} pano Panorama in which to display marker.
+ * {google.maps.StreetViewPov} position Marker position.
+ * {google.maps.Size} size The size of the marker in pixels.
  * {string} title Rollover text.
  * {boolean} visible If true, the marker is visible.
- * {google.maps.Size} size The size of the marker in pixels.
- * {google.maps.Point} anchor The point (in pixels) to which objects will snap.
+ * {number} zIndex The marker's z-index.
  */
 
 
@@ -106,6 +104,9 @@ var PanoMarker = function(opts) {
 
   /** @private @type {boolean} */
   this.visible_ = opts.visible || true;
+
+  /** @private @type {number} */
+  this.zIndex_ = opts.zIndex || 1;
 
   // At last, call some methods which use the initialized parameters
   this.setPano(opts.pano || null);
@@ -251,7 +252,7 @@ PanoMarker.prototype.onAdd = function() {
   marker.style.width = this.size_.width + 'px';
   marker.style.height = this.size_.height + 'px';
   marker.style.display = this.visible_ ? 'block' : 'none';
-  marker.style.zIndex = '2';
+  marker.style.zIndex = this.zIndex_;
 
   // Set other css attributes based on the given parameters
   if (this.id_) { marker.id = this.id_; }
@@ -344,6 +345,10 @@ PanoMarker.prototype.getTitle = function() { return this.title_; };
 
 /** @return {boolean} Whether the marker is currently visible. */
 PanoMarker.prototype.getVisible = function() { return this.visible_; };
+
+
+/** @return {number} The marker's z-index. */
+PanoMarker.prototype.getZIndex = function() { return this.zIndex_; };
 
 
 //// Setter for the properties mentioned above ////
@@ -459,5 +464,14 @@ PanoMarker.prototype.setVisible = function(show) {
   this.visible_ = show;
   if (!!this.marker_) {
     this.marker_.style.display = show ? 'block' : 'none';
+  }
+};
+
+
+/** @param {number} zIndex The new z-index. */
+PanoMarker.prototype.setZIndex = function(zIndex) {
+  this.zIndex_ = zIndex;
+  if (!!this.marker_) {
+    this.marker_.style.zIndex = zIndex;
   }
 };
