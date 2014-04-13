@@ -9,6 +9,12 @@ All scripts are open-source, licensed under the Apache License, Version 2 (see
 LICENSE for details). Feel free to use the scripts in your own projects or
 modify them according to your needs.
 
+There are many live examples of the addons for you to try at
+[marmat.github.io](http://marmat.github.io/google-maps-api-addons).
+Furthermore the site contains reference docs in the style of the original
+Google Maps JavaScript API documentation to make it even easier for you to use
+the classes.
+
 Contents
 --------
 
