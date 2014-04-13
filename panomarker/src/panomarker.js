@@ -1,6 +1,6 @@
 /**
  * PanoMarker
- * Version 0.0
+ * Version 0.9
  *
  * @author kaktus621@gmail.com (Martin Matysiak)
  * @fileoverview A marker that can be placed inside custom StreetView panoramas.
@@ -71,47 +71,50 @@ var PanoMarker = function(opts) {
   // following won't throw errors.
   opts = opts || {};
 
-  /** @private @type {?google.maps.StreetViewPanorama} */
-  this.pano_ = null;
-
-  /** @private @type {google.maps.StreetViewPov} */
-  this.position_ = opts.position || {heading: 0, pitch: 0};
+  /** @private @type {google.maps.Point} */
+  this.anchor_ = opts.anchor || new google.maps.Point(16, 16);
 
   /** @private @type {?string} */
-  this.id_ = opts.id || null;
-
-  /** @private @type {?string} */
-  this.class_ = opts.className || null;
+  this.className_ = opts.className || null;
 
   /** @private @type {?string} */
   this.icon_ = opts.icon || null;
 
   /** @private @type {?string} */
-  this.title_ = opts.title || null;
-
-  /** @private @type {boolean} */
-  this.visible_ = opts.visible || true;
-
-  /** @private @type {google.maps.Size} */
-  this.size_ = opts.size || new google.maps.Size(32, 32);
-
-  /** @private @type {google.maps.Point} */
-  this.anchor_ = opts.anchor || new google.maps.Point(16, 16);
+  this.id_ = opts.id || null;
 
   /** @private @ŧype {?HTMLDivElement} */
   this.marker_ = null;
 
-  /** @priavte @type {Object} */
-  this.povListener_ = null;
+  /** @private @type {?google.maps.StreetViewPanorama} */
+  this.pano_ = null;
 
   /** @private @type {number} */
   this.pollId_ = -1;
+
+  /** @private @type {google.maps.StreetViewPov} */
+  this.position_ = opts.position || {heading: 0, pitch: 0};
+
+  /** @priavte @type {Object} */
+  this.povListener_ = null;
+
+  /** @private @type {google.maps.Size} */
+  this.size_ = opts.size || new google.maps.Size(32, 32);
+
+  /** @private @type {string} */
+  this.title_ = opts.title || '';
+
+  /** @private @type {boolean} */
+  this.visible_ = opts.visible || true;
 
   // At last, call some methods which use the initialized parameters
   this.setPano(opts.pano || null);
 };
 
 PanoMarker.prototype = new google.maps.OverlayView();
+
+
+//// Static helper methods for the position calculation ////
 
 
 /**
@@ -235,6 +238,9 @@ PanoMarker.povToPixel = function(targetPov, currentPov, viewport) {
 };
 
 
+//// Implementations for abstract methods inherited from g.m.OverlayView ////
+
+
 /** @override */
 PanoMarker.prototype.onAdd = function() {
   var marker = document.createElement('div');
@@ -249,13 +255,13 @@ PanoMarker.prototype.onAdd = function() {
 
   // Set other css attributes based on the given parameters
   if (this.id_) { marker.id = this.id_; }
-  if (this.class_) { marker.className = this.class_; }
+  if (this.className_) { marker.className = this.className_; }
   if (this.title_) { marker.title = this.title_; }
   if (this.icon_) { marker.style.backgroundImage = 'url(' + this.icon_ + ')'; }
 
   // If neither icon, class nor id is specified, assign the basic google maps
   // marker image to the marker (otherwise it will be invisble)
-  if (!(this.id_ || this.class_ || this.icon_)) {
+  if (!(this.id_ || this.className_ || this.icon_)) {
     marker.style.backgroundImage = 'url(https://www.google.com/intl/en_us/' +
         'mapfiles/ms/micons/red-dot.png)';
   }
@@ -270,14 +276,6 @@ PanoMarker.prototype.onAdd = function() {
       'pov_changed', this.draw.bind(this));
 
   this.draw();
-};
-
-
-/** @override */
-PanoMarker.prototype.onRemove = function() {
-  google.maps.event.removeListener(this.povListener_);
-  this.marker_.parentNode.removeChild(this.marker_);
-  this.marker_ = null;
 };
 
 
@@ -301,73 +299,87 @@ PanoMarker.prototype.draw = function() {
 };
 
 
-/**
- * Getter for .position_
- * @return {google.maps.LatLng} An object representing the current position.
- */
-PanoMarker.prototype.getPosition = function() {
-  return this.position_;
+/** @override */
+PanoMarker.prototype.onRemove = function() {
+  google.maps.event.removeListener(this.povListener_);
+  this.marker_.parentNode.removeChild(this.marker_);
+  this.marker_ = null;
 };
 
 
-/**
- * Method for repositioning the marker. The change will be drawn immediatly
- *
- * @param {google.maps.LatLng} position A google.maps.LatLng object with
- * the desired position.
- */
-PanoMarker.prototype.setPosition = function(position) {
-  this.position_ = position;
+//// Getter to be roughly equivalent to the regular google.maps.Marker ////
+
+
+/** @return {google.maps.Point} The marker's anchor. */
+PanoMarker.prototype.getAnchor = function() { return this.anchor_; };
+
+
+/** @return {string} The className or null if not set upon marker creation. */
+PanoMarker.prototype.getClassName = function() { return this.className_; };
+
+
+/** @return {string} The current icon, if any. */
+PanoMarker.prototype.getIcon = function() { return this.icon_; };
+
+
+/** @return {string} The identifier or null if not set upon marker creation. */
+PanoMarker.prototype.getId = function() { return this.id_; };
+
+
+/** @return {google.maps.StreetViewPanorama} The current panorama. */
+PanoMarker.prototype.getPano = function() { return this.pano_; };
+
+
+/** @return {google.maps.StreetViewPow} The marker's current position. */
+PanoMarker.prototype.getPosition = function() { return this.position_; };
+
+
+/** @return {google.maps.Size} The marker's size. */
+PanoMarker.prototype.getSize = function() { return this.size_; };
+
+
+/** @return {string} The marker's rollover text. */
+PanoMarker.prototype.getTitle = function() { return this.title_; };
+
+
+/** @return {boolean} Whether the marker is currently visible. */
+PanoMarker.prototype.getVisible = function() { return this.visible_; };
+
+
+//// Setter for the properties mentioned above ////
+
+
+/** @param {google.maps.Point} anchor The marker's new anchor. */
+PanoMarker.prototype.setAnchor = function(anchor) {
+  this.anchor_ = anchor;
   this.draw();
 };
 
 
-/**
- * Method for obtaining the Identifier of the marker
- *
- * @return {string} The identifier or null if not set upon marker creation.
-*/
-PanoMarker.prototype.getId = function() {
-  return this.id_;
+/** @param {string} className The new className. */
+PanoMarker.prototype.setClassName = function(className) {
+  this.className_ = className;
+  if (!!this.marker_) {
+    this.marker_.className = className;
+  }
 };
 
 
-/**
- * Getter for .title_
- * @return {string} If set, the marker's rollover text, otherwise an empty
- *    string.
- */
-PanoMarker.prototype.getTitle = function() {
-  return this.title_ || '';
+/** @param {?string} icon URL to a new icon, or null in order to remove it. */
+PanoMarker.prototype.setIcon = function(icon) {
+  this.icon_ = icon;
+  if (!!this.marker_) {
+    this.marker_.style.backgroundImage = !!icon ? 'url(' + icon + ')' : '';
+  }
 };
 
 
-/**
- * Setter for .title_
- * @param {string} title the new rollover text.
- */
-PanoMarker.prototype.setTitle = function(title) {
-  this.title_ = title;
-  this.marker_.title = title;
-};
-
-
-/**
- * Getter for .visible_
- * @return {boolean} true if the marker is set to being visible, else false.
- */
-PanoMarker.prototype.getVisible = function() {
-  return this.visible_;
-};
-
-
-/**
- * Setter for .visible_
- * @param {boolean} show true if marker shall be shown, else false.
- */
-PanoMarker.prototype.setVisible = function(show) {
-  this.visible_ = show;
-  this.marker_.style.display = show ? 'block' : 'none';
+/** @param {string} id The new id. */
+PanoMarker.prototype.setId = function(id) {
+  this.id_ = id;
+  if (!!this.marker_) {
+    this.marker_.id = id;
+  }
 };
 
 
@@ -403,7 +415,6 @@ PanoMarker.prototype.setPano = function(pano) {
     } else {
       // Poll for panes to become available
       var pollCallback = function() {
-        console.log('poooollll');
         if (!!this.getPanes()) {
           window.clearInterval(this.pollId_);
           this.onAdd();
@@ -416,9 +427,37 @@ PanoMarker.prototype.setPano = function(pano) {
 };
 
 
-/**
- * @return {google.maps.StreetViewPanorama} The current panorama.
- */
-PanoMarker.prototype.getPano = function() {
-  return this.pano_;
+/** @param {google.maps.StreetViewPov} position The desired position. */
+PanoMarker.prototype.setPosition = function(position) {
+  this.position_ = position;
+  this.draw();
+};
+
+
+/** @param {google.maps.Size} size The new size. */
+PanoMarker.prototype.setSize = function(size) {
+  this.size_ = size;
+  if (!!this.marker_) {
+    this.marker_.style.width = size.width + 'px';
+    this.marker_.style.height = size.height + 'px';
+    this.draw();
+  }
+};
+
+
+/** @param {string} title The new rollover text. */
+PanoMarker.prototype.setTitle = function(title) {
+  this.title_ = title;
+  if (!!this.marker_) {
+    this.marker_.title = title;
+  }
+};
+
+
+/** @param {boolean} show Whether the marker shall be visible. */
+PanoMarker.prototype.setVisible = function(show) {
+  this.visible_ = show;
+  if (!!this.marker_) {
+    this.marker_.style.display = show ? 'block' : 'none';
+  }
 };
