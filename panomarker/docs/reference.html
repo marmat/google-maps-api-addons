@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>PanoMarker</title>
+    <link href="docs.css" rel="stylesheet">
+    <!--
+
+    Regular Expressions for semi-automating the documentation process...
+
+    Properties:
+    search \* \{([^\}]+)\} ([^ ]+) (.*)
+    replace <tr><td><code>$2</code></td>\n<td><code>$1</code></td>\n<td>$3</td></tr>
+
+    Methods (getters):
+    search \n\n/\*\* @return \{([^\}]+)\}.*\n[^\.]+\.[^\.]+\.([^ ]+).*
+    replace <tr>\n<td><code>$2()</code></td>\n<td><code>$1</code></td>\n<td></td>\n</tr>
+
+    -->
+  </head>
+
+  <body class="one-column docs main">
+    <div id="gc-content">
+      <h1 class="page-title">Google Maps API Addons Reference</h1>
+
+      <h2 id="PanoMarker">PanoMarker class</h2>
+      <p>This class extends <code><a href="https://developers.google.com/maps/documentation/javascript/reference#OverlayView">google.maps.OverlayView</a></code>.
+
+      <h3>Constructor</h3>
+      <table>
+        <tr>
+          <th>Constructor</th>
+          <th>Description</th>
+        </tr>
+        <tr>
+          <td><code>PanoMaker(opts?:<a href="#PanoMarkerOptions">PanoMarkerOptions</a>)</code></td>
+          <td>Creates a PanoMarker with the options specified. If a panorama is specified, the marker is added to the map upon construction. Note that the position must be set for the marker to display. Important: do not use the inherited method <code>setMap()</code> to change the panorama, but use <code>setPano()</code> instead, otherwise a proper functionality is not guaranteed.</td>
+        </tr>
+      </table>
+
+      <h3>Methods</h3>
+      <table>
+        <tr>
+          <th>Methods</th>
+          <th>Return Value</th>
+          <th>Description</th>
+        </tr>
+        <tr>
+          <td><code>getAnchor()</code></td>
+          <td><code><a href="https://developers.google.com/maps/documentation/javascript/reference#Point">google.maps.Point</a></code></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td><code>getClassName()</code></td>
+          <td><code>string</code></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td><code>getClickable()</code></td>
+          <td><code>boolean</code></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td><code>getIcon()</code></td>
+          <td><code>string</code></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td><code>getId()</code></td>
+          <td><code>string</code></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td><code>getPano()</code></td>
+          <td><code><a href="https://developers.google.com/maps/documentation/javascript/reference#StreetViewPanorama">google.maps.StreetViewPanorama</a></code></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td><code>getPosition()</code></td>
+          <td><code><a href="https://developers.google.com/maps/documentation/javascript/reference#StreetViewPov">google.maps.StreetViewPov</a></code></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td><code>getSize()</code></td>
+          <td><code><a href="https://developers.google.com/maps/documentation/javascript/reference#Size">google.maps.Size</a></code></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td><code>getTitle()</code></td>
+          <td><code>string</code></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td><code>getVisible()</code></td>
+          <td><code>boolean</code></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td><code>getZIndex()</code></td>
+          <td><code>number</code></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td><code>setAnchor(anchor:<a href="https://developers.google.com/maps/documentation/javascript/reference#Point">google.maps.Point</a>)</code></td>
+          <td><code>None</code></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td><code>setClassName(className:string)</code></td>
+          <td><code>None</code></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td><code>setClickable(clickable:boolean)</code></td>
+          <td><code>None</code></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td><code>setIcon(icon?:string)</code></td>
+          <td><code>None</code></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td><code>setId(id:string)</code></td>
+          <td><code>None</code></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td><code>setPano(pano:<a href="https://developers.google.com/maps/documentation/javascript/reference#StreetViewPanorama">google.maps.StreetViewPanorama</a>)</code></td>
+          <td><code>None</code></td>
+          <td>Renders the marker on the specified panorama. If pano is set to null, the marker will be removed.</td>
+        </tr>
+        <tr>
+          <td><code>setPosition(position:<a href="https://developers.google.com/maps/documentation/javascript/reference#StreetViewPov">google.maps.StreetViewPov</a>)</code></td>
+          <td><code>None</code></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td><code>setSize(size:<a href="https://developers.google.com/maps/documentation/javascript/reference#Size">google.maps.Size</a>)</code></td>
+          <td><code>None</code></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td><code>setTitle(title:string)</code></td>
+          <td><code>None</code></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td><code>setVisible(visible:boolean)</code></td>
+          <td><code>None</code></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td><code>setZIndex(zIndex:number)</code></td>
+          <td><code>None</code></td>
+          <td></td>
+        </tr>
+      </table>
+
+      <h3>Static Methods</h3>
+      <table>
+        <tr>
+          <th>Methods</th>
+          <th>Return Value</th>
+          <th>Description</th>
+        </tr>
+        <tr>
+          <td><code>getFov(zoom:number)</code></td>
+          <td><code>number</code></td>
+          <td>The (horizontal) field of view angle for the given zoom.</td>
+        </tr>
+        <tr>
+          <td><code>povToPixel(targetPov:<a href="https://developers.google.com/maps/documentation/javascript/reference#StreetViewPov">google.maps.StreetViewPov</a>, currentPov:<a href="https://developers.google.com/maps/documentation/javascript/reference#StreetViewPov">google.maps.StreetViewPov</a>, viewport:Element)</code></td>
+          <td><code>Object({left:number, top:number})</code></td>
+          <td>Given the current POV, this method calculates the Pixel coordinates on the given viewport for the desired POV. All credit for the math this method goes to user3146587 on StackOverflow: <a href="http://goo.gl/0GGKi6">goo.gl/0GGKi6</a></td>
+        </tr>
+      </table>
+
+      <h3>Events</h3>
+      <table>
+        <tr>
+          <th>Events</th>
+          <th>Arguments</th>
+          <th>Description</th>
+        </tr>
+        <tr>
+          <td><code>click</code></td>
+          <td><code><a href="https://developers.google.com/maps/documentation/javascript/reference#MouseEvent">MouseEvent</a></code></td>
+          <td>This event is fired when the marker icon was clicked.</td>
+        </tr>
+      </table>
+
+      <h2 id="PanoMarkerOptions">PanoMarkerOptions object specification</h2>
+      <h3>Properties</h3>
+      <table>
+        <tr>
+          <th>Properties</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+        <tr>
+          <td><code>anchor</code></td>
+          <td><code><a href="https://developers.google.com/maps/documentation/javascript/reference#Point">google.maps.Point</a></code></td>
+          <td>The point (in pixels) to which objects will snap.</td>
+        </tr>
+        <tr>
+          <td><code>className</code></td>
+          <td><code>string<code></td>
+          <td>The class name which will be assigned to the created div node.</td>
+        </tr>
+        <tr>
+          <td><code>icon</code></td>
+          <td><code>string<code></td>
+          <td>URL to an image file that shall be used.</td>
+        </tr>
+        <tr>
+          <td><code>id</code></td>
+          <td><code>string<code></td>
+          <td>A unique identifier that will be assigned to the created div-node.</td>
+        </tr>
+        <tr>
+          <td><code>pano</code></td>
+          <td><code><a href="https://developers.google.com/maps/documentation/javascript/reference#StreetViewPanorama">google.maps.StreetViewPanorama</a></code></td>
+          <td>Panorama in which to display marker.</td>
+        </tr>
+        <tr>
+          <td><code>position</code></td>
+          <td><code><a href="https://developers.google.com/maps/documentation/javascript/reference#StreetViewPov">google.maps.StreetViewPov</a></code></td>
+          <td>Marker position.</td>
+        </tr>
+        <tr>
+          <td><code>size</code></td>
+          <td><code><a href="https://developers.google.com/maps/documentation/javascript/reference#Size">google.maps.Size</a><code></td>
+          <td>The size of the marker in pixels.</td>
+        </tr>
+        <tr>
+          <td><code>title</code></td>
+          <td><code>string<code></td>
+          <td>Rollover text.</td>
+        </tr>
+        <tr>
+          <td><code>visible</code></td>
+          <td><code>boolean<code></td>
+          <td>If true, the marker is visible.</td>
+        </tr>
+        <tr>
+          <td><code>zIndex</code></td>
+          <td><code>number<code></td>
+          <td>The marker's z-index.</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

@@ -1,6 +1,6 @@
 /**
  * PanoMarker
- * Version 0.9
+ * Version 1.0
  *
  * @author kaktus621@gmail.com (Martin Matysiak)
  * @fileoverview A marker that can be placed inside custom StreetView panoramas.
@@ -54,11 +54,13 @@
 
 
 /**
- * Constructor of the marker. Extends OverlayView in order to work with Google
- * Maps events.
+ * Creates a PanoMarker with the options specified. If a panorama is specified,
+ * the marker is added to the map upon construction. Note that the position must
+ * be set for the marker to display.
  *
- * DO NOT USE THE INHERITED setMap METHOD DIRECTLY, IT WON'T WORK, USE setPano
- * INSTEAD!
+ * Important: do not use the inherited method <code>setMap()</code> to change
+ * the panorama, but use <code>setPano()</code> instead, otherwise a proper
+ * functionality is not guaranteed.
  *
  * @constructor
  * @param {PanoMarkerOptions} opts A set of parameters to customize the marker.
@@ -357,7 +359,7 @@ PanoMarker.prototype.getId = function() { return this.id_; };
 PanoMarker.prototype.getPano = function() { return this.pano_; };
 
 
-/** @return {google.maps.StreetViewPow} The marker's current position. */
+/** @return {google.maps.StreetViewPov} The marker's current position. */
 PanoMarker.prototype.getPosition = function() { return this.position_; };
 
 
