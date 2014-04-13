@@ -56,10 +56,15 @@
 
 
 /**
- * Constructor of the marker.
+ * Constructor of the marker. Extends OverlayView in order to work with Google
+ * Maps events.
+ *
+ * DO NOT USE THE INHERITED setMap METHOD DIRECTLY, IT WON'T WORK, USE setPano
+ * INSTEAD!
  *
  * @constructor
  * @param {PanoMarkerOptions} opts A set of parameters to customize the marker.
+ * @extends google.maps.OverlayView
  */
 var PanoMarker = function(opts) {
   // In case no options have been given at all, fallback to {} so that the
@@ -67,7 +72,7 @@ var PanoMarker = function(opts) {
   opts = opts || {};
 
   /** @private @type {?google.maps.StreetViewPanorama} */
-  this.pano_ = opts.pano || null;
+  this.pano_ = null;
 
   /** @private @type {google.maps.StreetViewPov} */
   this.position_ = opts.position || {heading: 0, pitch: 0};
@@ -99,10 +104,14 @@ var PanoMarker = function(opts) {
   /** @priavte @type {Object} */
   this.povListener_ = null;
 
+  /** @private @type {number} */
+  this.pollId_ = -1;
+
   // At last, call some methods which use the initialized parameters
-  this.create_();
-  this.setPano(this.pano_);
+  this.setPano(opts.pano || null);
 };
+
+PanoMarker.prototype = new google.maps.OverlayView();
 
 
 /**
@@ -226,7 +235,8 @@ PanoMarker.povToPixel = function(targetPov, currentPov, viewport) {
 };
 
 
-PanoMarker.prototype.create_ = function() {
+/** @override */
+PanoMarker.prototype.onAdd = function() {
   var marker = document.createElement('div');
 
   // Basic style attributes for every marker
@@ -252,8 +262,22 @@ PanoMarker.prototype.create_ = function() {
 
   this.marker_ = marker;
 
+  this.getPanes().overlayMouseTarget.appendChild(marker);
+
   // Attach to some global events
   window.addEventListener('resize', this.draw.bind(this));
+  this.povListener_ = google.maps.event.addListener(this.getMap(),
+      'pov_changed', this.draw.bind(this));
+
+  this.draw();
+};
+
+
+/** @override */
+PanoMarker.prototype.onRemove = function() {
+  google.maps.event.removeListener(this.povListener_);
+  this.marker_.parentNode.removeChild(this.marker_);
+  this.marker_ = null;
 };
 
 
@@ -263,7 +287,9 @@ PanoMarker.prototype.draw = function() {
     return;
   }
 
-  // Calculate the position according to the viewport etc etc
+  // Calculate the position according to the viewport. Even though the marker
+  // doesn't sit directly underneath the panorama container, we pass it on as
+  // the viewport because it has the actual viewport dimensions.
   var offset = PanoMarker.povToPixel(this.position_,
       this.pano_.getPov(),
       this.pano_.getContainer());
@@ -279,7 +305,9 @@ PanoMarker.prototype.draw = function() {
  * Getter for .position_
  * @return {google.maps.LatLng} An object representing the current position.
  */
-PanoMarker.prototype.getPosition = function() { return this.position_; };
+PanoMarker.prototype.getPosition = function() {
+  return this.position_;
+};
 
 
 /**
@@ -344,31 +372,53 @@ PanoMarker.prototype.setVisible = function(show) {
 
 
 /**
- * Getter for .pano_
- * @return {google.maps.StreetViewPanorama} The panorama.
+ * It turns out OverlayViews can be used with StreetViewPanoramas as well.
+ * However, we have to fire onAdd and onRemove calls manually as they are not
+ * triggered automatically for some reason if the object given to setMap is a
+ * StreetViewPanorama.
+ *
+ * @param {google.maps.StreetViewPanorama} pano The panorama in which to show
+ *    the marker.
  */
-PanoMarker.prototype.getPano = function() { return this.pano_; };
+PanoMarker.prototype.setPano = function(pano) {
+  // In contrast to regular OverlayViews, we are disallowing the usage on
+  // regular maps
+  if (!!pano && !(pano instanceof google.maps.StreetViewPanorama)) {
+    throw 'PanoMarker only works inside a StreetViewPanorama.';
+  }
+
+  // Remove the marker if it previously was on a panorama
+  if (!!this.pano_) {
+    this.onRemove();
+  }
+
+  // Call method from superclass
+  this.setMap(pano);
+  this.pano_ = pano;
+
+  // Fire the onAdd Event manually as soon as the pano is ready
+  if (!!pano) {
+    if (!!this.getPanes()) {
+      this.onAdd();
+    } else {
+      // Poll for panes to become available
+      var pollCallback = function() {
+        console.log('poooollll');
+        if (!!this.getPanes()) {
+          window.clearInterval(this.pollId_);
+          this.onAdd();
+        }
+      };
+
+      this.pollId_ = window.setInterval(pollCallback.bind(this), 10);
+    }
+  }
+};
 
 
 /**
- * Setter for .pano_. Adds the marker to the requested panorama.
- * @param {google.maps.StreetViewPanorama} pano The new panorama, or null if the
- *    marker shall be removed.
+ * @return {google.maps.StreetViewPanorama} The current panorama.
  */
-PanoMarker.prototype.setPano = function(pano) {
-  if (pano == null) {
-    this.marker_.parentNode.removeChild(this.marker_);
-  } else {
-    // Unbind from old panorama, if any
-    if (this.povListener_ !== null) {
-      google.maps.event.removeListener(this.povListener_);
-    }
-
-    pano.getContainer().appendChild(this.marker_);
-    this.povListener_ =
-      google.maps.event.addListener(pano, 'pov_changed', this.draw.bind(this));
-  }
-
-  this.pano_ = pano;
-  this.draw();
+PanoMarker.prototype.getPano = function() {
+  return this.pano_;
 };
