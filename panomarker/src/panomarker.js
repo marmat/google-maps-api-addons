@@ -75,6 +75,9 @@ var PanoMarker = function(opts) {
   /** @private @type {?string} */
   this.className_ = opts.className || null;
 
+  /** @private @type {boolean} */
+  this.clickable_ = opts.clickable || true;
+
   /** @private @type {?string} */
   this.icon_ = opts.icon || null;
 
@@ -276,6 +279,13 @@ PanoMarker.prototype.onAdd = function() {
   this.povListener_ = google.maps.event.addListener(this.getMap(),
       'pov_changed', this.draw.bind(this));
 
+  // Make clicks possible
+  if (marker.attachEvent) {
+    marker.attachEvent('onclick', this.onClick.bind(this));
+  } else {
+    marker.addEventListener('click', this.onClick.bind(this), false);
+  }
+
   this.draw();
 };
 
@@ -300,6 +310,18 @@ PanoMarker.prototype.draw = function() {
 };
 
 
+/** @param {Object} event The event object. */
+PanoMarker.prototype.onClick = function(event) {
+  if (this.clickable_) {
+    google.maps.event.trigger(this, 'click');
+  }
+
+  // don't let the event bubble up
+  event.cancelBubble = true;
+  if (event.stopPropagation) { event.stopPropagation(); }
+};
+
+
 /** @override */
 PanoMarker.prototype.onRemove = function() {
   google.maps.event.removeListener(this.povListener_);
@@ -317,6 +339,10 @@ PanoMarker.prototype.getAnchor = function() { return this.anchor_; };
 
 /** @return {string} The className or null if not set upon marker creation. */
 PanoMarker.prototype.getClassName = function() { return this.className_; };
+
+
+/** @return {boolean} Whether the marker is clickable. */
+PanoMarker.prototype.getClickable = function() { return this.clickable_; };
 
 
 /** @return {string} The current icon, if any. */
@@ -367,6 +393,12 @@ PanoMarker.prototype.setClassName = function(className) {
   if (!!this.marker_) {
     this.marker_.className = className;
   }
+};
+
+
+/** @param {boolean} clickable Whether the marker shall be clickable. */
+PanoMarker.prototype.setClickable = function(clickable) {
+  this.clickable_ = clickable;
 };
 
 
