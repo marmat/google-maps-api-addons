@@ -2,157 +2,127 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title> v Reference</title>
-    <link rel="stylesheet" type="text/css" href="http://code.google.com/css/codesite.css"></link>
-    <link rel="stylesheet" type="text/css" href="template/local_extensions.css"></link>
+    <title>DayNightOverlay Reference</title>
+    <link href="docs.css" rel="stylesheet">
   </head>
-  <body>
-    <h1></h1>
+  <body class="main docs one-column">
+      <div id="gc-content">
+      <h1 class="page-title">Google Maps API Addons Reference</h1>
     <p>Day/Night Overlay<br>
 Version 1.0<br>
 <br>
 This class provides a custom overlay which shows an approximation of where the day/night line runs at any given date. The overlay uses an HTML5 canvas to draw the night area, therefore a HTML5 compatible browser (or a polyfill) should be used.</p>
     <p>For a description and examples of how to use this library, check out the <a href="../examples">examples</a>.</p>
-    
+
       <h2><a name="DayNightOverlay"></a>class DayNightOverlay</h2>
-      <p>  This class extends <code>google.maps.OverlayView</code>.</p>
-      
+      <p>  This class extends <code><a href="https://developers.google.com/maps/documentation/javascript/reference#OverlayView">google.maps.OverlayView</a></code>.</p>
+
         <h3>Constructor</h3>
-        <table summary="class DayNightOverlay - Constructor" width="90%">
-          
+        <table summary="class DayNightOverlay - Constructor">
+
           <tbody>
             <tr>
               <th>Constructor</th>
-              
+
               <th>Description</th>
             </tr>
-            
-              <tr class="odd">
-                <td><code>DayNightOverlay(<span class="type">opt_params:DayNightOverlayOptions=</span>)</code></td>
-                
+
+              <tr>
+                <td><code>DayNightOverlay(<span class="type">opt_params:<a href="#DayNightOverlayOptions">DayNightOverlayOptions</a>=</span>)</code></td>
+
                 <td>The Class which represents the Overlay.</td>
               </tr>
-            
+
           </tbody>
         </table>
-      
+
         <h3>Methods</h3>
-        <table summary="class DayNightOverlay - Methods" width="90%">
-          
+        <table summary="class DayNightOverlay - Methods">
+
           <tbody>
             <tr>
               <th>Methods</th>
-              
-                
+
+
                   <th>Return&nbsp;Value</th>
-                
-              
+
+
               <th>Description</th>
             </tr>
-            
-              <tr class="odd">
-                <td><code>draw()</code></td>
-                
-                  
-                    <td><code>None</code></td>
-                  
-                
-                <td></td>
+
+              <tr>
+                <td><code>setDate(date:Date)</code></td>
+                <td><code>None</code></td>
+                <td>Pass a specific point in time for which the day/night-overview shall be calculated (UTC date is taken) or null if the current time shall be taken.</td>
               </tr>
-            
-              <tr class="even">
-                <td><code>onAdd()</code></td>
-                
-                  
-                    <td><code>None</code></td>
-                  
-                
-                <td></td>
-              </tr>
-            
-              <tr class="odd">
-                <td><code>onRemove()</code></td>
-                
-                  
-                    <td><code>None</code></td>
-                  
-                
-                <td></td>
-              </tr>
-            
+
           </tbody>
         </table>
-      
-    
+
+
       <h2><a name="DayNightOverlayOptions"></a>class DayNightOverlayOptions</h2>
       <p>This class represents the optional parameter passed to the <a href="#DayNightOverlay">DayNightOverlay</a> constructor.  There is no constructor for this class.  Instead, this class is instantiated as a javascript object literal.</p>
-      
+
         <h3>Properties</h3>
-        <table summary="class DayNightOverlayOptions - Properties" width="90%">
-          
+        <table summary="class DayNightOverlayOptions - Properties">
+
           <tbody>
             <tr>
               <th>Properties</th>
-              
-                
+
+
                   <th>Type</th>
-                
-              
+
+
               <th>Description</th>
             </tr>
-            
-              <tr class="odd">
+
+              <tr>
                 <td><code>date</code></td>
-                
-                  
+
+
                     <td><code>Date</code></td>
-                  
-                
+
+
                 <td>A specific point of time for which the day/night-
 overview shall be calculated (UTC date is taken).</td>
               </tr>
-            
-              <tr class="even">
+
+              <tr>
                 <td><code>fillColor</code></td>
-                
-                  
+
+
                     <td><code>string</code></td>
-                  
-                
+
+
                 <td>A color string that will be used when drawing
 the night area.</td>
               </tr>
-            
-              <tr class="odd">
+
+              <tr>
                 <td><code>id</code></td>
-                
-                  
+
+
                     <td><code>string</code></td>
-                  
-                
+
+
                 <td>A unique identifiert which will be assigned to the
 canvas on which we will draw.</td>
               </tr>
-            
-              <tr class="even">
+
+              <tr>
                 <td><code>map</code></td>
-                
-                  
-                    <td><code>google.maps.Map</code></td>
-                  
-                
+
+
+                    <td><code><a href="https://developers.google.com/maps/documentation/javascript/reference#Map">google.maps.Map</a></code></td>
+
+
                 <td>A handle to the Google Maps map on which the
 overlay shall be shown.</td>
               </tr>
-            
+
           </tbody>
         </table>
-      
-    
-    <script src="http://www.google-analytics.com/urchin.js" type="text/javascript"></script>
-    <script type="text/javascript">
-      _uacct = "UA-964209-4";
-      urchinTracker();
-    </script> 
+        </div>
   </body>
 </html>

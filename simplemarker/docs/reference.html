@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>SimpleMarker</title>
+    <link href="docs.css" rel="stylesheet">
+    <!--
+
+    Regular Expressions for semi-automating the documentation process...
+
+    Properties:
+    search \* \{([^\}]+)\} ([^ ]+) (.*)
+    replace <tr><td><code>$2</code></td>\n<td><code>$1</code></td>\n<td>$3</td></tr>
+
+    Methods (getters):
+    search \n\n/\*\* @return \{([^\}]+)\}.*\n[^\.]+\.[^\.]+\.([^ ]+).*
+    replace <tr>\n<td><code>$2()</code></td>\n<td><code>$1</code></td>\n<td></td>\n</tr>
+
+    -->
+  </head>
+
+  <body class="one-column docs main">
+    <div id="gc-content">
+      <h1 class="page-title">Google Maps API Addons Reference</h1>
+
+      <h2 id="SimpleMarker">SimpleMarker class</h2>
+      <p>A lightweight marker class, based on the lightweight marker sample by google but trimmed down to my needs even more.</p>
+      <p>This class extends <code><a href="https://developers.google.com/maps/documentation/javascript/reference#OverlayView">google.maps.OverlayView</a></code>.
+
+      <h3>Constructor</h3>
+      <table>
+        <tr>
+          <th>Constructor</th>
+          <th>Description</th>
+        </tr>
+        <tr>
+          <td><code>SimpleMarker(opts?:<a href="#SimpleMarkerOptions">SimpleMarkerOptions</a>)</code></td>
+          <td>Creates a SimpleMarker with the options specified. If a map is specified, the marker is added to the map upon construction.</td>
+        </tr>
+      </table>
+
+      <h3>Methods</h3>
+      <table>
+        <tr>
+          <th>Methods</th>
+          <th>Return Value</th>
+          <th>Description</th>
+        </tr>
+        <tr>
+          <td><code>getAnchor()</code></td>
+          <td><code><a href="https://developers.google.com/maps/documentation/javascript/reference#Point">google.maps.Point</a></code></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td><code>getBounds(zoom?:number)</code></td>
+          <td><code><a href="https://developers.google.com/maps/documentation/javascript/reference#LatLngBounds">google.maps.LatLngBounds</a></code></td>
+          <td>This method returns the bounds of our marker in latitude and longitude values, based on the current or given zoom value of the map. You can use these bounds for a clustering algorithm, as you can now easily check if a LatLng-coordinate is inside the marker's bounds (i.e. the two objects overlap) or not.</td>
+        <tr>
+          <td><code>getClassName()</code></td>
+          <td><code>string</code></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td><code>getIcon()</code></td>
+          <td><code>string</code></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td><code>getId()</code></td>
+          <td><code>string</code></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td><code>getMap()</code></td>
+          <td><code><a href="https://developers.google.com/maps/documentation/javascript/reference#Map">google.maps.Map</a></code></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td><code>getPosition()</code></td>
+          <td><code><a href="https://developers.google.com/maps/documentation/javascript/reference#LatLng">google.maps.LatLng</a></code></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td><code>getSize()</code></td>
+          <td><code><a href="https://developers.google.com/maps/documentation/javascript/reference#Size">google.maps.Size</a></code></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td><code>getTitle()</code></td>
+          <td><code>string</code></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td><code>getVisible()</code></td>
+          <td><code>boolean</code></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td><code>setAnchor(anchor:<a href="https://developers.google.com/maps/documentation/javascript/reference#Point">google.maps.Point</a>)</code></td>
+          <td><code>None</code></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td><code>setClassName(className:string)</code></td>
+          <td><code>None</code></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td><code>setIcon(icon?:string)</code></td>
+          <td><code>None</code></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td><code>setId(id:string)</code></td>
+          <td><code>None</code></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td><code>setMap(map:<a href="https://developers.google.com/maps/documentation/javascript/reference#Map">google.maps.Map</a>)</code></td>
+          <td><code>None</code></td>
+          <td>Renders the marker on the specified map. If map is set to null, the marker will be removed.</td>
+        </tr>
+        <tr>
+          <td><code>setPosition(position:<a href="https://developers.google.com/maps/documentation/javascript/reference#LatLng">google.maps.LatLng</a>)</code></td>
+          <td><code>None</code></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td><code>setSize(size:<a href="https://developers.google.com/maps/documentation/javascript/reference#Size">google.maps.Size</a>)</code></td>
+          <td><code>None</code></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td><code>setTitle(title:string)</code></td>
+          <td><code>None</code></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td><code>setVisible(visible:boolean)</code></td>
+          <td><code>None</code></td>
+          <td></td>
+        </tr>
+      </table>
+
+      <h3>Static Methods</h3>
+      <table>
+        <tr>
+          <th>Methods</th>
+          <th>Return Value</th>
+          <th>Description</th>
+        </tr>
+        <tr>
+          <td><code>getLatLngPerPixel(zoom?:number)</code></td>
+          <td><code><a href="https://developers.google.com/maps/documentation/javascript/reference#LatLng">google.maps.LatLng</a></code></td>
+          <td>Calculates the Latitude/Longitude per pixel ratio based on the given zoom.</td>
+        </tr>
+      </table>
+
+      <h3>Events</h3>
+      <table>
+        <tr>
+          <th>Events</th>
+          <th>Arguments</th>
+          <th>Description</th>
+        </tr>
+        <tr>
+          <td><code>click</code></td>
+          <td><code><a href="https://developers.google.com/maps/documentation/javascript/reference#MouseEvent">MouseEvent</a></code></td>
+          <td>This event is fired when the marker icon was clicked.</td>
+        </tr>
+      </table>
+
+      <h2 id="SimpleMarkerOptions">SimpleMarkerOptions object specification</h2>
+      <h3>Properties</h3>
+      <table>
+        <tr>
+          <th>Properties</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+        <tr>
+          <td><code>anchor</code></td>
+          <td><code><a href="https://developers.google.com/maps/documentation/javascript/reference#Point">google.maps.Point</a></code></td>
+          <td>The point (in pixels) to which objects will snap.</td>
+        </tr>
+        <tr>
+          <td><code>className</code></td>
+          <td><code>string<code></td>
+          <td>The class name which will be assigned to the created div node.</td>
+        </tr>
+        <tr>
+          <td><code>icon</code></td>
+          <td><code>string<code></td>
+          <td>URL to an image file that shall be used.</td>
+        </tr>
+        <tr>
+          <td><code>id</code></td>
+          <td><code>string<code></td>
+          <td>A unique identifier that will be assigned to the created div-node.</td>
+        </tr>
+        <tr>
+          <td><code>map</code></td>
+          <td><code><a href="https://developers.google.com/maps/documentation/javascript/reference#Map">google.maps.Map</a></code></td>
+          <td>Map on which to display marker.</td>
+        </tr>
+        <tr>
+          <td><code>position</code></td>
+          <td><code><a href="https://developers.google.com/maps/documentation/javascript/reference#LatLng">google.maps.LatLng</a></code></td>
+          <td>Marker position.</td>
+        </tr>
+        <tr>
+          <td><code>size</code></td>
+          <td><code><a href="https://developers.google.com/maps/documentation/javascript/reference#Size">google.maps.Size</a><code></td>
+          <td>The size of the marker in pixels.</td>
+        </tr>
+        <tr>
+          <td><code>title</code></td>
+          <td><code>string<code></td>
+          <td>Rollover text.</td>
+        </tr>
+        <tr>
+          <td><code>visible</code></td>
+          <td><code>boolean<code></td>
+          <td>If true, the marker is visible.</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

@@ -20,13 +20,13 @@
             mapTypeId: google.maps.MapTypeId.ROADMAP
           }
         );
-        
+
         // create a simple marker with the default appearance
         new SimpleMarker({
           map: mapObj,
           position: new google.maps.LatLng(50.7658, 6.1059)
         });
-        
+
         // create a simple marker with custom appearance
         var marker = new SimpleMarker({
           map: mapObj,
@@ -35,13 +35,13 @@
           icon: 'greendot.png',
           size: new google.maps.Size(48,48),
           anchor: new google.maps.Point(24,24),
-          title: 'Simple, isn\'t it?'  
+          title: 'Simple, isn\'t it?'
         });
-        
+
         // you can also add a click listener as usual
         google.maps.event.addListener(marker, 'click', function() {
-          alert("Hello, SimpleMarker!\nMy bounds are: " + 
-              this.getBounds().toString() + 
+          alert("Hello, SimpleMarker!\nMy bounds are: " +
+              this.getBounds().toString() +
               "\nIf you change the zoom, the bounds will, too!"
           );
         });
@@ -57,7 +57,7 @@
       }
     </style>
   </head>
-  
+
   <body onload="init()">
     <div id="map" style="width:620px; height:500px"></div>
     <pre>
@@ -85,13 +85,13 @@ var marker = new SimpleMarker({
   icon: 'greendot.png',
   size: new google.maps.Size(48,48),
   anchor: new google.maps.Point(24,24),
-  title: 'Simple, isn\'t it?'  
+  title: 'Simple, isn\'t it?'
 });
 
 // you can also add a click listener as usual
 google.maps.event.addListener(marker, 'click', function() {
-  alert("Hello, SimpleMarker!\nMy bounds are: " + 
-      this.getBounds().toString() + 
+  alert("Hello, SimpleMarker!\nMy bounds are: " +
+      this.getBounds().toString() +
       "\nIf you change the zoom, the bounds will, too!"
   );
 });

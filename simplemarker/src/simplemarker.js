@@ -1,7 +1,7 @@
 
 /**
  * SimpleMarker
- * Version 2.0
+ * Version 2.1
  *
  * @author kaktus621@gmail.com (Martin Matysiak)
  * @fileoverview A lightweight marker class, based on the lightweight
@@ -27,20 +27,17 @@
 /**
  * SimpleMarkerOptions
  *
- * Please note that some parameters are required! If those are not specified,
- * an error will be thrown.
- *
- * {google.maps.Map} map Map on which to display Marker.
- * {google.maps.LatLng} position Marker position. Required.
- * {string} id A unique identifier that will be assigned to the
- *    created div-node.
+ * {google.maps.Point} anchor The point (in pixels) to which objects will snap.
  * {string} className The class name which will be assigned to the
  *    created div node.
  * {string} icon URL to an image file that shall be used.
+ * {string} id A unique identifier that will be assigned to the
+ *    created div-node.
+ * {google.maps.Map} map Map on which to display Marker.
+ * {google.maps.LatLng} position Marker position. Required.
+ * {google.maps.Size} size The size of the marker in pixels.
  * {string} title Rollover text.
  * {boolean} visible If true, the marker is visible.
- * {google.maps.Size} size The size of the marker in pixels.
- * {google.maps.Point} anchor The point (in pixels) to which objects will snap.
  */
 
 
@@ -50,94 +47,46 @@
  *
  * @constructor
  * @extends {google.maps.OverlayView}
- * @param {SimpleMarkerOptions} opts A set of parameters to customize the
+ * @param {?SimpleMarkerOptions} opts A set of parameters to customize the
  *    marker.
  */
 var SimpleMarker = function(opts) {
-
-  /** @private @type {?google.maps.Map} */
-  this.map_ = null;
-
-  /** @private @ŧype {?HTMLDivElement} */
-  this.marker_ = null;
-
-  /** @private @type {?string} */
-  this.id_ = null;
-
-  /** @private @type {?string} */
-  this.class_ = null;
-
-  /** @private @type {?string} */
-  this.icon_ = null;
-
-  /** @private @type {?string} */
-  this.title_ = null;
-
-  /** @private @type {boolean} */
-  this.visible_ = true;
-
-  /** @private @type {google.maps.Size} */
-  this.size_ = new google.maps.Size(32, 32);
+  opts = opts || {};
 
   /** @private @type {google.maps.Point} */
-  this.anchor_ = new google.maps.Point(16, 16);
+  this.anchor_ = opts.anchor || new google.maps.Point(16, 16);
 
   /** @private @type {Array.<google.maps.LatLngBounds>} */
   this.bounds_ = [];
 
+  /** @private @type {?string} */
+  this.className_ = opts.className || null;
 
-  // Set required parameters
-  if (SimpleMarker.isUndefined(opts)) {
-    throw 'No parameters specified. Please specify at least the required ones.';
-  }
+  /** @private @type {?string} */
+  this.icon_ = opts.icon || null;
 
-  if (SimpleMarker.isUndefined(opts.position)) {
-    throw 'Required parameter \'position\' is missing.';
-  }
+  /** @private @type {?string} */
+  this.id_ = opts.id || null;
+
+  /** @private @type {?google.maps.Map} */
+  this.map_ = opts.map || null;
+
+  /** @private @ŧype {?HTMLDivElement} */
+  this.marker_ = null;
 
   /** @private @type {google.maps.LatLng} */
-  this.position_ = opts.position;
+  this.position_ = opts.position || new google.maps.LatLng(0, 0);
 
+  /** @private @type {google.maps.Size} */
+  this.size_ = opts.size || new google.maps.Size(32, 32);
 
-  // Now merge the optional parameters
-  if (!SimpleMarker.isUndefined(opts.map)) {
-    this.map_ = opts.map;
-  }
+  /** @private @type {string} */
+  this.title_ = opts.title || '';
 
-  if (!SimpleMarker.isUndefined(opts.id)) {
-    this.id_ = opts.id;
-  }
-
-  if (!SimpleMarker.isUndefined(opts.className)) {
-    this.class_ = opts.className;
-  }
-
-  if (!SimpleMarker.isUndefined(opts.icon)) {
-    this.icon_ = opts.icon;
-  }
-
-  if (!SimpleMarker.isUndefined(opts.title)) {
-    this.title_ = opts.title;
-  }
-
-  if (!SimpleMarker.isUndefined(opts.visible)) {
-    this.visible_ = opts.visible;
-  }
-
-  if (!SimpleMarker.isUndefined(opts.size)) {
-    this.size_ = opts.size;
-  }
-
-  if (!SimpleMarker.isUndefined(opts.anchor)) {
-    this.anchor_ = opts.anchor;
-  }
-
-  if (!SimpleMarker.isUndefined(opts.bounds)) {
-    this.bounds_ = opts.bounds;
-  }
+  /** @private @type {boolean} */
+  this.visible_ = opts.visible || true;
 
   // At last, call some methods which use the initialized parameters
-  this.setVisible(this.visible_);
   this.setMap(this.map_);
 };
 
@@ -158,13 +107,13 @@ SimpleMarker.prototype.onAdd = function() {
 
   // Set other css attributes based on the given parameters
   if (this.id_) { marker.id = this.id_; }
-  if (this.class_) { marker.className = this.class_; }
+  if (this.className_) { marker.className = this.className_; }
   if (this.title_) { marker.title = this.title_; }
   if (this.icon_) { marker.style.backgroundImage = 'url(' + this.icon_ + ')'; }
 
   // If neither icon, class nor id is specified, assign the basic google maps
   // marker image to the marker (otherwise it will be invisble)
-  if (!(this.id_ || this.class_ || this.icon_)) {
+  if (!(this.id_ || this.className_ || this.icon_)) {
     marker.style.backgroundImage = 'url(https://www.google.com/intl/en_us/' +
         'mapfiles/ms/micons/red-dot.png)';
   }
@@ -209,45 +158,19 @@ SimpleMarker.prototype.draw = function() {
 };
 
 
-/**
- * Getter for .position_
- * @return {google.maps.LatLng} An object representing the current position.
- */
-SimpleMarker.prototype.getPosition = function() { return this.position_; };
+//// Getter ////
+
+
+/** @return {google.maps.Point} The marker's anchor. */
+SimpleMarker.prototype.getAnchor = function() { return this.anchor_; };
 
 
 /**
- * Method for repositioning the marker. The change will be drawn immediatly
- *
- * @param {google.maps.LatLng} position A google.maps.LatLng object with
- * the desired position.
- */
-SimpleMarker.prototype.setPosition = function(position) {
-  this.position_ = position;
-  // Clear the bounds cache as the bounds are false when the position changes
-  this.bounds_ = [];
-  // Redraw the marker
-  this.draw();
-};
-
-
-/**
- * Method for obtaining the Identifier of the marker
- *
- * @return {string} The identifier or null if not set upon marker creation.
-*/
-SimpleMarker.prototype.getId = function() {
-  return this.id_;
-};
-
-
-/**
- * This method returns the bounds of our marker in latitude
- * and longitude values, based on the current or given zoom
- * value of the map.
- * You can use these bounds for a clustering algorithm, as you
- * can now easily check if a LatLng-coordinate is inside the
- * marker's bounds (i.e. the two objects overlap) or not.
+ * This method returns the bounds of our marker in latitude and longitude
+ * values, based on the current or given zoom value of the map. You can use
+ * these bounds for a clustering algorithm, as you can now easily check if a
+ * LatLng-coordinate is inside the marker's bounds (i.e. the two objects
+ * overlap) or not.
  *
  * @param {?number} zoom A zoom value for which you want to calculate the
  *    bounds of your marker. If not set, the current zoom value of the map
@@ -268,75 +191,125 @@ SimpleMarker.prototype.getBounds = function(zoom) {
 
     this.bounds_[zoom] = new google.maps.LatLngBounds(
         new google.maps.LatLng(
-        this.position_.lat() + convRatio.lat() *
-        (this.anchor_.y - this.size_.height),
-        this.position_.lng() - convRatio.lng() * this.anchor_.x
+          this.position_.lat() + convRatio.lat() *
+          (this.anchor_.y - this.size_.height),
+          this.position_.lng() - convRatio.lng() * this.anchor_.x
         ),
         new google.maps.LatLng(
-        this.position_.lat() + convRatio.lat() * this.anchor_.y,
-        this.position_.lng() - convRatio.lng() *
-        (this.anchor_.x - this.size_.width)
-        )
-        );
+          this.position_.lat() + convRatio.lat() * this.anchor_.y,
+          this.position_.lng() - convRatio.lng() *
+          (this.anchor_.x - this.size_.width)
+        ));
   }
 
   return this.bounds_[zoom];
 };
 
 
-/**
- * Getter for .title_
- * @return {?string} If set, the marker's rollover text, otherwise an empty
- *    string.
- */
-SimpleMarker.prototype.getTitle = function() {
-  return this.title_ ? this.title_ : '';
+/** @return {string} The className or null if not set upon marker creation. */
+SimpleMarker.prototype.getClassName = function() { return this.className_; };
+
+
+/** @return {string} The current icon, if any. */
+SimpleMarker.prototype.getIcon = function() { return this.icon_; };
+
+
+/** @return {string} The identifier or null if not set upon marker creation. */
+SimpleMarker.prototype.getId = function() { return this.id_; };
+
+
+/** @return {google.maps.LatLng} The marker's current position. */
+SimpleMarker.prototype.getPosition = function() { return this.position_; };
+
+
+/** @return {google.maps.Size} The marker's size. */
+SimpleMarker.prototype.getSize = function() { return this.size_; };
+
+
+/** @return {string} The marker's rollover text. */
+SimpleMarker.prototype.getTitle = function() { return this.title_; };
+
+
+/** @return {boolean} Whether the marker is currently visible. */
+SimpleMarker.prototype.getVisible = function() { return this.visible_; };
+
+
+//// Setter ////
+
+
+/** @param {google.maps.Point} anchor The marker's new anchor. */
+SimpleMarker.prototype.setAnchor = function(anchor) {
+  this.anchor_ = anchor;
+  this.draw();
 };
 
 
-/**
- * Setter for .title_
- * @param {string} title the new rollover text.
- */
+/** @param {string} className The new className. */
+SimpleMarker.prototype.setClassName = function(className) {
+  this.className_ = className;
+  if (!!this.marker_) {
+    this.marker_.className = className;
+  }
+};
+
+
+/** @param {?string} icon URL to a new icon, or null in order to remove it. */
+SimpleMarker.prototype.setIcon = function(icon) {
+  this.icon_ = icon;
+  if (!!this.marker_) {
+    this.marker_.style.backgroundImage = !!icon ? 'url(' + icon + ')' : '';
+  }
+};
+
+
+/** @param {string} id The new id. */
+SimpleMarker.prototype.setId = function(id) {
+  this.id_ = id;
+  if (!!this.marker_) {
+    this.marker_.id = id;
+  }
+};
+
+
+/** @param {google.maps.StreetViewPov} position The desired position. */
+SimpleMarker.prototype.setPosition = function(position) {
+  this.position_ = position;
+  this.bounds_ = []; // cached bounds become invalid with a new position
+  this.draw();
+};
+
+
+/** @param {google.maps.Size} size The new size. */
+SimpleMarker.prototype.setSize = function(size) {
+  this.size_ = size;
+  if (!!this.marker_) {
+    this.marker_.style.width = size.width + 'px';
+    this.marker_.style.height = size.height + 'px';
+    this.draw();
+  }
+};
+
+
+/** @param {string} title The new rollover text. */
 SimpleMarker.prototype.setTitle = function(title) {
-  if (this.marker_) {
+  this.title_ = title;
+  if (!!this.marker_) {
     this.marker_.title = title;
   }
-
-  this.title_ = title;
 };
 
 
-/**
- * Getter for .visible_
- * @return {boolean} true if the marker is set to being visible, else false.
- */
-SimpleMarker.prototype.getVisible = function() {
-  return this.visible_;
-};
-
-
-/**
- * Setter for .visible_
- * @param {boolean} show true if marker shall be shown, else false.
- */
+/** @param {boolean} show Whether the marker shall be visible. */
 SimpleMarker.prototype.setVisible = function(show) {
-  if (this.marker_) {
+  this.visible_ = show;
+  if (!!this.marker_) {
     this.marker_.style.display = show ? 'block' : 'none';
   }
-
-  this.visible_ = show;
 };
 
 
 /**
- * Static helper method which calculates the Latitude/Longitude per pixel ratio
- * based on the given zoom.
- *
- * If you want to speed up things, you might replace the formula by an array
- * of constant LatLng values, as the ratio isn't depending on any factors but
- * the map's scaling. If this should change in the future, you would have
- * to adjust the formula either way.
+ * Calculates the Latitude/Longitude per pixel ratio based on the given zoom.
  *
  * @param {number} zoom The zoom value for which you want to know the
  *    conversion ratio from pixel to LatLng.
@@ -349,17 +322,4 @@ SimpleMarker.getLatLngPerPixel = function(zoom) {
   var lat = 2 * lng / Math.PI;
 
   return new google.maps.LatLng(lat, lng);
-};
-
-
-/**
- * Static helper method which checks whether the given element is undefined
- * or not. Using the typeof command in combination with a string comparison
- * is the best way to do that.
- *
- * @param {?Object} object The object which shall be checked.
- * @return {boolean} True if the object is defined, otherwise false.
- */
-SimpleMarker.isUndefined = function(object) {
-  return typeof object === 'undefined';
 };
