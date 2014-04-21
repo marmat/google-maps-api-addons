@@ -184,6 +184,8 @@ PanoMarker.povToPixel = function(targetPov, currentPov, viewport) {
     // f = focal length = distance of current POV to image plane
     var f = (width / 2) / Math.tan(fov / 2);
 
+    // our coordinate system: camera at (0,0,0), heading = pitch = 0 at (0,f,0)
+    // calculate 3d coordinates of viewport center and target
     var cos_p = Math.cos(p);
     var sin_p = Math.sin(p);
 
@@ -207,21 +209,36 @@ PanoMarker.povToPixel = function(targetPov, currentPov, viewport) {
     var nDotD = x0 * x + y0 * y + z0 * z;
     var nDotC = x0 * x0 + y0 * y0 + z0 * z0;
 
-    // Sanity checks
+    // nDotD == |targetVec| * |currentVec| * cos(theta)
+    // nDotC == |currentVec| * |currentVec| * 1
+    // Note: |currentVec| == |targetVec| == f
+
+    // Sanity check: the vectors shouldn't be perpendicular because the line
+    // from camera through target would never intersect with the image plane
     if (Math.abs(nDotD) < 1e-6) {
       return null;
     }
 
+    // t is the scale to use for the target vector such that its end
+    // touches the image plane. It's equal to 1/cos(theta) ==
+    //     (distance from camera to image plane through target) /
+    //     (distance from camera to target == f)
     var t = nDotC / nDotD;
 
+    // Sanity check: it doesn't make sense to scale the vector in a negative
+    // direction. In fact, it should even be t >= 1.0 since the image plane
+    // is always outside the pano sphere (except at the viewport center)
     if (t < 0.0) {
       return null;
     }
 
+    // (tx, ty, tz) are the coordinates of the intersection point between a
+    // line through camera and target with the image plane
     var tx = t * x;
     var ty = t * y;
     var tz = t * z;
 
+    // u and v are the basis vectors for the image plane
     var vx = -sin_p0 * sin_h0;
     var vy = -sin_p0 * cos_h0;
     var vz =  cos_p0;
@@ -230,14 +247,18 @@ PanoMarker.povToPixel = function(targetPov, currentPov, viewport) {
     var uy = -cos_p0 * sin_h0;
     var uz = 0;
 
+    // normalize horiz. basis vector to obtain orthonormal basis
     var ul = Math.sqrt(ux * ux + uy * uy + uz * uz);
     ux /= ul;
     uy /= ul;
     uz /= ul;
 
+    // project the intersection point t onto the basis to obtain offsets in
+    // terms of actual pixels in the viewport
     var du = tx * ux + ty * uy + tz * uz;
     var dv = tx * vx + ty * vy + tz * vz;
 
+    // use the calculated pixel offsets
     target.left += du;
     target.top -= dv;
     return target;
