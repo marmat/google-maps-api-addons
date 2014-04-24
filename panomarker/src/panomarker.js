@@ -157,6 +157,9 @@ PanoMarker.getFov = function(zoom) {
  * given viewport for the desired POV. All credit for the math this method goes
  * to user3146587 on StackOverflow: http://goo.gl/0GGKi6
  *
+ * My own approach to explain what is being done here (including figures!) can
+ * be found at http://martinmatysiak.de/blog/view/panomarker
+ *
  * @param {StreetViewPov} targetPov The point-of-view whose coordinates are
  *     requested.
  * @param {StreetViewPov} currentPov POV of the viewport center.
@@ -273,7 +276,7 @@ PanoMarker.prototype.onAdd = function() {
   var marker = document.createElement('div');
 
   // Basic style attributes for every marker
-  marker.style.position = 'relative';
+  marker.style.position = 'absolute';
   marker.style.cursor = 'pointer';
   marker.style.width = this.size_.width + 'px';
   marker.style.height = this.size_.height + 'px';
