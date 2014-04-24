@@ -193,8 +193,8 @@ PanoMarker.povToPixel = function(targetPov, currentPov, viewport) {
     var sin_h = Math.sin(h);
 
     var x = f * cos_p * sin_h;
-    var z = f * sin_p;
     var y = f * cos_p * cos_h;
+    var z = f * sin_p;
 
     var cos_p0 = Math.cos(p0);
     var sin_p0 = Math.sin(p0);
@@ -203,8 +203,8 @@ PanoMarker.povToPixel = function(targetPov, currentPov, viewport) {
     var sin_h0 = Math.sin(h0);
 
     var x0 = f * cos_p0 * sin_h0;
-    var z0 = f * sin_p0;
     var y0 = f * cos_p0 * cos_h0;
+    var z0 = f * sin_p0;
 
     var nDotD = x0 * x + y0 * y + z0 * z;
     var nDotC = x0 * x0 + y0 * y0 + z0 * z0;
@@ -243,8 +243,8 @@ PanoMarker.povToPixel = function(targetPov, currentPov, viewport) {
     var vy = -sin_p0 * cos_h0;
     var vz =  cos_p0;
 
-    var ux =  cos_p0 * cos_h0;
-    var uy = -cos_p0 * sin_h0;
+    var ux = cos_h0;
+    var uy = -sin_h0;
     var uz = 0;
 
     // normalize horiz. basis vector to obtain orthonormal basis
