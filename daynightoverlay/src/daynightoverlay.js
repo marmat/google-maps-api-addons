@@ -35,6 +35,8 @@
  * overview shall be calculated (UTC date is taken).
  * {google.maps.Map} map A handle to the Google Maps map on which the
  * overlay shall be shown.
+ * {number} smallZoomThreshold A threshold for small zoom levels on
+ * viewports with small dimensions.
  */
 
 
@@ -84,6 +86,14 @@ var DayNightOverlay = function(opt_params) {
   if (typeof opt_params.map != 'undefined') {
     this.setMap(opt_params.map);
   }
+
+  /**
+   * If maps zoom level is smaller than this threshold, then we adjust the
+   * viewport to the world's dimensions, extended by half a world width on
+   * the left and right.
+   * @type {number} A zoom level
+   */
+  this.smallZoomThreshold = opt_params.smallZoomThreshold || 3;
 };
 
 DayNightOverlay.prototype = new google.maps.OverlayView();
@@ -145,7 +155,7 @@ DayNightOverlay.prototype.draw = function() {
   // The viewport dimensions seem to be a bit buggy on small zoom levels.
   // Therefore we adjust the viewport to the world's dimensions, extended by
   // half a world width on the left and right
-  if (this.getMap().getZoom() < 3) {
+  if (this.getMap().getZoom() < this.smallZoomThreshold) {
     //visibleDim = worldDim;
     visibleDim.x = worldDim.x - worldDim.width;
     visibleDim.y = worldDim.y;
