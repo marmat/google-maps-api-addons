@@ -29,15 +29,29 @@
  *
  * {string} fillColor A color string that will be used when drawing
  * the night area.
- * {string} id A unique identifiert which will be assigned to the
+ * {string} id A unique identifier which will be assigned to the
  * canvas on which we will draw.
  * {Date} date A specific point of time for which the day/night-
  * overview shall be calculated (UTC date is taken).
  * {google.maps.Map} map A handle to the Google Maps map on which the
  * overlay shall be shown.
+ * {number} smallZoomThreshold A threshold for small zoom levels on
+ * viewports with small dimensions.
  */
 
 
+(function (global, factory) {
+  if (typeof module === 'object' && typeof module.exports === 'object' ) {
+    module.exports = factory();
+  } else if (typeof define === 'function' && typeof define.amd === 'object') {
+    define(['goog!maps,3,other_params:[sensor=false&libraries=visualization]'], factory);
+  } else {
+    if (typeof google !== 'object' || typeof google.maps !== 'object') {
+      throw new Error('DayNightOverlay requires google maps library');
+    }
+    global.DayNightOverlay = factory();
+  }
+}(typeof window !== 'undefined' ? window : this, function() {
 
 /**
  * The Class which represents the Overlay.
@@ -47,6 +61,7 @@
  * @extends {google.maps.OverlayView}
  */
 var DayNightOverlay = function(opt_params) {
+  opt_params = opt_params || {};
 
   /**
    * The canvas on which we will draw later on.
@@ -60,7 +75,7 @@ var DayNightOverlay = function(opt_params) {
    * @type {!string}
    * @private
    */
-  this.fillColor_ = 'rgba(0,0,0,0.5)';
+  this.fillColor_ = opt_params.fillColor || 'rgba(0,0,0,0.5)';
 
   /**
    * If specified, this ID will be assigned to the Canvas element which will be
@@ -68,7 +83,7 @@ var DayNightOverlay = function(opt_params) {
    * @type {?string}
    * @private
    */
-  this.id_ = null;
+  this.id_ = opt_params.id || null;
 
   /**
    * If specified, this fixed date will be drawn instead of the current time.
@@ -78,26 +93,19 @@ var DayNightOverlay = function(opt_params) {
    * @type {?Date} A date object that should be displayed
    * @private
    */
-  this.date_ = null;
+  this.date_ = opt_params.date || null;
 
-  if (typeof opt_params == 'object') {
-    // Check which defaults shall be overwritten
-    if (typeof opt_params.fillColor != 'undefined') {
-      this.fillColor_ = opt_params.fillColor;
-    }
-
-    if (typeof opt_params.id != 'undefined') {
-      this.id_ = opt_params.id;
-    }
-
-    if (typeof opt_params.date != 'undefined') {
-      this.date_ = opt_params.date;
-    }
-
-    if (typeof opt_params.map != 'undefined') {
-      this.setMap(opt_params.map);
-    }
+  if (typeof opt_params.map != 'undefined') {
+    this.setMap(opt_params.map);
   }
+
+  /**
+   * If maps zoom level is smaller than this threshold, then we adjust the
+   * viewport to the world's dimensions, extended by half a world width on
+   * the left and right.
+   * @type {number} A zoom level
+   */
+  this.smallZoomThreshold = opt_params.smallZoomThreshold || 3;
 };
 
 DayNightOverlay.prototype = new google.maps.OverlayView();
@@ -159,7 +167,7 @@ DayNightOverlay.prototype.draw = function() {
   // The viewport dimensions seem to be a bit buggy on small zoom levels.
   // Therefore we adjust the viewport to the world's dimensions, extended by
   // half a world width on the left and right
-  if (this.getMap().getZoom() < 3) {
+  if (this.getMap().getZoom() < this.smallZoomThreshold) {
     //visibleDim = worldDim;
     visibleDim.x = worldDim.x - worldDim.width;
     visibleDim.y = worldDim.y;
@@ -406,3 +414,6 @@ DayNightOverlay.prototype.getDayOfYear_ = function(date) {
 
   return Math.ceil((date.getTime() - firstDay.getTime()) / 86400000);
 };
+
+return DayNightOverlay;
+}));
