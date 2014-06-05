@@ -52,6 +52,18 @@
  */
 
 
+(function (global, factory) {
+  if (typeof module === 'object' && typeof module.exports === 'object' ) {
+    module.exports = factory();
+  } else if (typeof define === 'function' && typeof define.amd === 'object') {
+    define(['goog!maps,3,other_params:[sensor=false&libraries=visualization]'], factory);
+  } else {
+    if (typeof google !== 'object' || typeof google.maps !== 'object') {
+      throw new Error('PanoMarker requires google maps library');
+    }
+    global.PanoMarker = factory();
+  }
+}(typeof window !== 'undefined' ? window : this, function() {
 
 /**
  * Creates a PanoMarker with the options specified. If a panorama is specified,
@@ -533,3 +545,6 @@ PanoMarker.prototype.setZIndex = function(zIndex) {
     this.marker_.style.zIndex = zIndex;
   }
 };
+
+return PanoMarker;
+}));

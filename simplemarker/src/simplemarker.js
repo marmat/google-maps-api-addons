@@ -41,6 +41,18 @@
  */
 
 
+(function (global, factory) {
+  if (typeof module === 'object' && typeof module.exports === 'object' ) {
+    module.exports = factory();
+  } else if (typeof define === 'function' && typeof define.amd === 'object') {
+    define(['goog!maps,3,other_params:[sensor=false&libraries=visualization]'], factory);
+  } else {
+    if (typeof google !== 'object' || typeof google.maps !== 'object') {
+      throw new Error('SimpleMarker requires google maps library');
+    }
+    global.SimpleMarker = factory();
+  }
+}(typeof window !== 'undefined' ? window : this, function() {
 
 /**
  * Constructor of the marker.
@@ -323,3 +335,6 @@ SimpleMarker.getLatLngPerPixel = function(zoom) {
 
   return new google.maps.LatLng(lat, lng);
 };
+
+return SimpleMarker;
+}));
