@@ -38,6 +38,18 @@
  */
 
 
+(function (global, factory) {
+  if (typeof module === 'object' && typeof module.exports === 'object' ) {
+    module.exports = factory();
+  } else if (typeof define === 'function' && typeof define.amd === 'object') {
+    define(['goog!maps,3,other_params:[sensor=false&libraries=visualization]'], factory);
+  } else {
+    if (typeof google !== 'object' || typeof google.maps !== 'object') {
+      throw new Error('DayNightOverlay requires google maps library');
+    }
+    global.DayNightOverlay = factory();
+  }
+}(typeof window !== 'undefined' ? window : this, function() {
 
 /**
  * The Class which represents the Overlay.
@@ -406,3 +418,6 @@ DayNightOverlay.prototype.getDayOfYear_ = function(date) {
 
   return Math.ceil((date.getTime() - firstDay.getTime()) / 86400000);
 };
+
+return DayNightOverlay;
+}));
