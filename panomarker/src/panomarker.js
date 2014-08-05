@@ -285,6 +285,13 @@ PanoMarker.povToPixel = function(targetPov, currentPov, viewport) {
 
 /** @override */
 PanoMarker.prototype.onAdd = function() {
+  if (!!this.marker_) {
+    // Sometimes the maps API does trigger onAdd correctly. We have to prevent
+    // duplicate execution of the following code by checking if the marker node
+    // has already been created.
+    return;
+  }
+
   var marker = document.createElement('div');
 
   // Basic style attributes for every marker
@@ -362,6 +369,11 @@ PanoMarker.prototype.onClick = function(event) {
 
 /** @override */
 PanoMarker.prototype.onRemove = function() {
+  if (!this.marker_) {
+    // Similar to onAdd, we have to prevent duplicate onRemoves as well.
+    return;
+  }
+
   google.maps.event.removeListener(this.povListener_);
   this.marker_.parentNode.removeChild(this.marker_);
   this.marker_ = null;
