@@ -351,6 +351,11 @@ PanoMarker.prototype.draw = function() {
   if (offset !== null) {
     this.marker_.style.left = (offset.left - this.anchor_.x) + 'px';
     this.marker_.style.top = (offset.top - this.anchor_.y) + 'px';
+  } else {
+    // If offset is null, the marker is "behind" the camera,
+    // therefore we position the marker outside of the viewport
+    this.marker_.style.left = -(9999 + this.size_.width) + 'px';
+    this.marker_.style.top = '0';
   }
 };
 
