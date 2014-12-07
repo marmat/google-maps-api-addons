@@ -52,11 +52,12 @@
  */
 
 
-(function (global, factory) {
-  if (typeof module === 'object' && typeof module.exports === 'object' ) {
+(function(global, factory) {
+  if (typeof module === 'object' && typeof module.exports === 'object') {
     module.exports = factory();
   } else if (typeof define === 'function' && typeof define.amd === 'object') {
-    define(['goog!maps,3,other_params:[sensor=false&libraries=visualization]'], factory);
+    define(['goog!maps,3,other_params:[sensor=false&libraries=visualization]'],
+      factory);
   } else {
     if (typeof google !== 'object' || typeof google.maps !== 'object') {
       throw new Error('PanoMarker requires google maps library');
@@ -110,8 +111,11 @@ var PanoMarker = function(opts) {
   /** @private @type {google.maps.StreetViewPov} */
   this.position_ = opts.position || {heading: 0, pitch: 0};
 
-  /** @priavte @type {Object} */
+  /** @private @type {Object} */
   this.povListener_ = null;
+
+  /** @private @type {Object} */
+  this.zoomListener_ = null;
 
   /** @private @type {google.maps.Size} */
   this.size_ = opts.size || new google.maps.Size(32, 32);
@@ -127,6 +131,16 @@ var PanoMarker = function(opts) {
 
   // At last, call some methods which use the initialized parameters
   this.setPano(opts.pano || null);
+
+  /**
+   * Currently only Chrome is rendering panoramas in a 3D sphere. The other
+   * browsers are just showing the raw panorama tiles and pan them around.
+   *
+   * @private
+   * @type {function(StreetViewPov, StreetViewPov, number, Element): Object}
+   */
+  this.povToPixel_ = !!window.chrome ? PanoMarker.povToPixel3d :
+      PanoMarker.povToPixel2d;
 };
 
 PanoMarker.prototype = new google.maps.OverlayView();
@@ -138,8 +152,8 @@ PanoMarker.prototype = new google.maps.OverlayView();
 /**
  * According to the documentation (goo.gl/WT4B57), the field-of-view angle
  * should precisely follow the curve of the form 180/2^zoom. Unfortunately, this
- * is not the case in practice. From experiments, the following FOVs seem to be
- * more correct:
+ * is not the case in practice in the 3D environment. From experiments, the
+ * following FOVs seem to be more correct:
  *
  *        Zoom | best FOV | documented FOV
  *       ------+----------+----------------
@@ -157,7 +171,7 @@ PanoMarker.prototype = new google.maps.OverlayView();
  *
  * @return {number} The (horizontal) field of view angle for the given zoom.
  */
-PanoMarker.getFov = function(zoom) {
+PanoMarker.get3dFov = function(zoom) {
   return zoom <= 2 ?
       126.5 - zoom * 36.75 :  // linear descent
       195.93 / Math.pow(1.92, zoom); // parameters determined experimentally
@@ -175,11 +189,12 @@ PanoMarker.getFov = function(zoom) {
  * @param {StreetViewPov} targetPov The point-of-view whose coordinates are
  *     requested.
  * @param {StreetViewPov} currentPov POV of the viewport center.
+ * @param {number} zoom The current zoom level.
  * @param {Element} viewport The current viewport containing the panorama.
  * @return {Object} Top and Left offsets for the given viewport that point to
  *     the desired point-of-view.
  */
-PanoMarker.povToPixel = function(targetPov, currentPov, viewport) {
+PanoMarker.povToPixel3d = function(targetPov, currentPov, zoom, viewport) {
 
     // Gather required variables and convert to radians where necessary
     var width = viewport.offsetWidth;
@@ -190,7 +205,7 @@ PanoMarker.povToPixel = function(targetPov, currentPov, viewport) {
     };
 
     var DEG_TO_RAD = Math.PI / 180.0;
-    var fov = PanoMarker.getFov(currentPov.zoom || 1) * DEG_TO_RAD;
+    var fov = PanoMarker.get3dFov(zoom) * DEG_TO_RAD;
     var h0 = currentPov.heading * DEG_TO_RAD;
     var p0 = currentPov.pitch * DEG_TO_RAD;
     var h = targetPov.heading * DEG_TO_RAD;
@@ -256,7 +271,7 @@ PanoMarker.povToPixel = function(targetPov, currentPov, viewport) {
     // u and v are the basis vectors for the image plane
     var vx = -sin_p0 * sin_h0;
     var vy = -sin_p0 * cos_h0;
-    var vz =  cos_p0;
+    var vz = cos_p0;
 
     var ux = cos_h0;
     var uy = -sin_h0;
@@ -276,6 +291,40 @@ PanoMarker.povToPixel = function(targetPov, currentPov, viewport) {
     // use the calculated pixel offsets
     target.left += du;
     target.top -= dv;
+    return target;
+};
+
+
+/**
+ * A simpler version of povToPixel2d which does not have to do the spherical
+ * projection because the raw StreetView tiles are just panned around when the
+ * user changes the viewport position.
+ *
+ * @param {StreetViewPov} targetPov The point-of-view whose coordinates are
+ *     requested.
+ * @param {StreetViewPov} currentPov POV of the viewport center.
+ * @param {number} zoom The current zoom level.
+ * @param {Element} viewport The current viewport containing the panorama.
+ * @return {Object} Top and Left offsets for the given viewport that point to
+ *     the desired point-of-view.
+ */
+PanoMarker.povToPixel2d = function(targetPov, currentPov, zoom, viewport) {
+    // Gather required variables and convert to radians where necessary
+    var width = viewport.offsetWidth;
+    var height = viewport.offsetHeight;
+    var target = {
+      left: width / 2,
+      top: height / 2
+    };
+
+    // In the 2D environment, the FOV follows the documented curve.
+    var hfov = 180 / Math.pow(2, zoom);
+    var vfov = hfov * (height / width);
+    var dh = targetPov.heading - currentPov.heading;
+    var dv = targetPov.pitch - currentPov.pitch;
+
+    target.left += dh / hfov * width;
+    target.top -= dv / vfov * height;
     return target;
 };
 
@@ -323,6 +372,8 @@ PanoMarker.prototype.onAdd = function() {
   window.addEventListener('resize', this.draw.bind(this));
   this.povListener_ = google.maps.event.addListener(this.getMap(),
       'pov_changed', this.draw.bind(this));
+  this.zoomListener_ = google.maps.event.addListener(this.getMap(),
+      'zoom_changed', this.draw.bind(this));
 
   // Make clicks possible
   if (marker.attachEvent) {
@@ -344,8 +395,9 @@ PanoMarker.prototype.draw = function() {
   // Calculate the position according to the viewport. Even though the marker
   // doesn't sit directly underneath the panorama container, we pass it on as
   // the viewport because it has the actual viewport dimensions.
-  var offset = PanoMarker.povToPixel(this.position_,
+  var offset = this.povToPixel_(this.position_,
       this.pano_.getPov(),
+      this.pano_.getZoom() != null ? this.pano_.getZoom() : 1,
       this.pano_.getContainer());
 
   if (offset !== null) {
@@ -380,6 +432,7 @@ PanoMarker.prototype.onRemove = function() {
   }
 
   google.maps.event.removeListener(this.povListener_);
+  google.maps.event.removeListener(this.zoomListener_);
   this.marker_.parentNode.removeChild(this.marker_);
   this.marker_ = null;
 };
