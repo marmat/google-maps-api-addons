@@ -296,6 +296,25 @@ PanoMarker.povToPixel3d = function(targetPov, currentPov, zoom, viewport) {
 
 
 /**
+ * Helper function that converts the heading to be in the range [-180,180).
+ *
+ * @param {number} heading The heading to convert.
+ */
+PanoMarker.wrapHeading = function(heading) {
+  // We shift to the range [0,360) because of the way JS behaves for modulos of
+  // negative numbers.
+  heading = (heading + 180) % 360;
+
+  // Determine if we have to wrap around
+  if (heading < 0) {
+    heading += 360;
+  }
+
+  return heading - 180;
+};
+
+
+/**
  * A simpler version of povToPixel2d which does not have to do the spherical
  * projection because the raw StreetView tiles are just panned around when the
  * user changes the viewport position.
@@ -309,7 +328,7 @@ PanoMarker.povToPixel3d = function(targetPov, currentPov, zoom, viewport) {
  *     the desired point-of-view.
  */
 PanoMarker.povToPixel2d = function(targetPov, currentPov, zoom, viewport) {
-    // Gather required variables and convert to radians where necessary
+    // Gather required variables
     var width = viewport.offsetWidth;
     var height = viewport.offsetHeight;
     var target = {
@@ -320,7 +339,7 @@ PanoMarker.povToPixel2d = function(targetPov, currentPov, zoom, viewport) {
     // In the 2D environment, the FOV follows the documented curve.
     var hfov = 180 / Math.pow(2, zoom);
     var vfov = hfov * (height / width);
-    var dh = targetPov.heading - currentPov.heading;
+    var dh = PanoMarker.wrapHeading(targetPov.heading - currentPov.heading);
     var dv = targetPov.pitch - currentPov.pitch;
 
     target.left += dh / hfov * width;
