@@ -1,0 +1,22 @@
+{
+  "name": "google-maps-api-addons",
+  "version": "1.0.0",
+  "homepage": "https://github.com/marmat/google-maps-api-addons",
+  "authors": [
+    "Martin Matysiak <kaktus621@gmail.com>"
+  ],
+  "description": "A set of useful scripts for the Google Maps API",
+  "keywords": [
+    "google",
+    "maps",
+    "api"
+  ],
+  "license": "Apache License v2",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
