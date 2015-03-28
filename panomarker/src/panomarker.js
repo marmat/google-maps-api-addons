@@ -80,9 +80,20 @@
  * @extends google.maps.OverlayView
  */
 var PanoMarker = function(opts) {
+
   // In case no options have been given at all, fallback to {} so that the
   // following won't throw errors.
   opts = opts || {};
+
+  /**
+   * Currently only Chrome is rendering panoramas in a 3D sphere. The other
+   * browsers are just showing the raw panorama tiles and pan them around.
+   *
+   * @private
+   * @type {function(StreetViewPov, StreetViewPov, number, Element): Object}
+   */
+  this.povToPixel_ = !!window.chrome ? PanoMarker.povToPixel3d :
+      PanoMarker.povToPixel2d;
 
   /** @private @type {google.maps.Point} */
   this.anchor_ = opts.anchor || new google.maps.Point(16, 16);
@@ -131,16 +142,6 @@ var PanoMarker = function(opts) {
 
   // At last, call some methods which use the initialized parameters
   this.setPano(opts.pano || null);
-
-  /**
-   * Currently only Chrome is rendering panoramas in a 3D sphere. The other
-   * browsers are just showing the raw panorama tiles and pan them around.
-   *
-   * @private
-   * @type {function(StreetViewPov, StreetViewPov, number, Element): Object}
-   */
-  this.povToPixel_ = !!window.chrome ? PanoMarker.povToPixel3d :
-      PanoMarker.povToPixel2d;
 };
 
 PanoMarker.prototype = new google.maps.OverlayView();
