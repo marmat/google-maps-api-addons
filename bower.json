@@ -11,7 +11,7 @@
     "maps",
     "api"
   ],
-  "license": "Apache License v2",
+  "license": "Apache v2",
   "ignore": [
     "**/.*",
     "node_modules",
