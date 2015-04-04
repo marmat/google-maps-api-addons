@@ -576,13 +576,11 @@ PanoMarker.prototype.setPano = function(pano) {
   // Fire the onAdd Event manually as soon as the pano is ready
   if (!!pano) {
     var promiseFn = function(resolve) {
-
       // Poll for panes to become available
       var pollCallback = function() {
         if (!!this.getPanes()) {
           window.clearInterval(this.pollId_);
           this.onAdd();
-
           if (resolve) { resolve(this); }
         }
       };
