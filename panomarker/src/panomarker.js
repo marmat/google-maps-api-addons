@@ -417,7 +417,7 @@ PanoMarker.prototype.draw = function() {
   // the viewport because it has the actual viewport dimensions.
   var offset = this.povToPixel_(this.position_,
       this.pano_.getPov(),
-      this.pano_.getZoom() != null ? this.pano_.getZoom() : 1,
+      this.pano_.getZoom() !== null ? this.pano_.getZoom() : 1,
       this.pano_.getContainer());
 
   if (offset !== null) {
@@ -575,18 +575,25 @@ PanoMarker.prototype.setPano = function(pano) {
 
   // Fire the onAdd Event manually as soon as the pano is ready
   if (!!pano) {
-    if (!!this.getPanes()) {
-      this.onAdd();
-    } else {
+    var promiseFn = function(resolve) {
       // Poll for panes to become available
       var pollCallback = function() {
         if (!!this.getPanes()) {
           window.clearInterval(this.pollId_);
           this.onAdd();
+          if (resolve) { resolve(this); }
         }
       };
 
       this.pollId_ = window.setInterval(pollCallback.bind(this), 10);
+    };
+
+    // Best case, the promiseFn can be wrapped in a Promise so the consumer knows when the pano is set
+    // Otherwise just call the function immediately
+    if (typeof Promise !== 'undefined') {
+      return new Promise(promiseFn.bind(this));
+    } else {
+      promiseFn.call(this);
     }
   }
 };
