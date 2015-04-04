@@ -16,10 +16,17 @@
     "api",
     "plugin",
     "pano",
+    "panorama",
+    "street",
+    "view",
     "marker"
   ],
   "author": "Martin Matysiak",
-  "license": "Apache v2",
+  "contributors": [{
+    "name": "Mark LeMerise",
+    "email": "mark.s.lemerise@gmail.com"
+  }],
+  "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/marmat/google-maps-api-addons/issues"
   },
