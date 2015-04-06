@@ -19,7 +19,7 @@
  */
 
 /**
- * @license Copyright 2014 Martin Matysiak.
+ * @license Copyright 2014 — 2015 Martin Matysiak.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
