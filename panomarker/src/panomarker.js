@@ -395,12 +395,16 @@ PanoMarker.prototype.onAdd = function() {
   this.zoomListener_ = google.maps.event.addListener(this.getMap(),
       'zoom_changed', this.draw.bind(this));
 
+  var eventName = 'click';
+
   // Make clicks possible
-  if (marker.attachEvent) {
-    marker.attachEvent('onclick', this.onClick.bind(this));
-  } else {
-    marker.addEventListener('click', this.onClick.bind(this), false);
+  if (window.PointerEvent) {
+    eventName = 'pointerdown';
+  } else if (window.MSPointerEvent) {
+    eventName = 'MSPointerDown';
   }
+
+  marker.addEventListener(eventName, this.onClick.bind(this), false);
 
   this.draw();
 };
