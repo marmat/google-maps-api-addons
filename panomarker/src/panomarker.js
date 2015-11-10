@@ -56,7 +56,7 @@
   if (typeof module === 'object' && typeof module.exports === 'object') {
     module.exports = factory();
   } else if (typeof define === 'function' && typeof define.amd === 'object') {
-    define(['goog!maps,3,other_params:[key=AIzaSyBEkMdsK8yWsTAt4NKUxRzXm_57spy6Tqw&sensor=false&libraries=visualization]'],
+    define(['goog!maps,3,other_params:[sensor=false&libraries=visualization]'],
       factory);
   } else {
     if (typeof google !== 'object' || typeof google.maps !== 'object') {
