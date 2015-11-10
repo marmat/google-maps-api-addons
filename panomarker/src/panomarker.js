@@ -56,7 +56,7 @@
   if (typeof module === 'object' && typeof module.exports === 'object') {
     module.exports = factory();
   } else if (typeof define === 'function' && typeof define.amd === 'object') {
-    define(['goog!maps,3,other_params:[sensor=false&libraries=visualization]'],
+    define(['goog!maps,3,other_params:[key=AIzaSyBEkMdsK8yWsTAt4NKUxRzXm_57spy6Tqw&sensor=false&libraries=visualization]'],
       factory);
   } else {
     if (typeof google !== 'object' || typeof google.maps !== 'object') {
@@ -84,20 +84,6 @@ var PanoMarker = function(opts) {
   // In case no options have been given at all, fallback to {} so that the
   // following won't throw errors.
   opts = opts || {};
-
-  /**
-   * Rendering panoramas in a 3D sphere is configured using the (undocumented) StreetViewPanorama.mode setting.
-   * (see: https://groups.google.com/forum/#!msg/google-maps-js-api-v3/FNP2INYAUpw/LurOZk0bX_EJ)
-   * Possible values are: "html4", "html5", and "webgl". Using "webgl" or "html5" will cause Rendering in a 3D sphere.
-   * Currently only Chrome is rendering panoramas in a 3D sphere by default. For other browsers this has to be
-   * configured explicitly. By default other browsers are just showing the raw panorama tiles and pan them around.
-   *
-   * @private
-   * @type {function(StreetViewPov, StreetViewPov, number, Element): Object}
-   */
-    this.povToPixel_ = opts.pano !== null && (opts.pano.mode === "webgl" || opts.pano.mode === "html5") ?
-        PanoMarker.povToPixel3d :
-        PanoMarker.povToPixel2d;
 
   /** @private @type {google.maps.Point} */
   this.anchor_ = opts.anchor || new google.maps.Point(16, 16);
@@ -571,6 +557,20 @@ PanoMarker.prototype.setPano = function(pano) {
   if (!!pano && !(pano instanceof google.maps.StreetViewPanorama)) {
     throw 'PanoMarker only works inside a StreetViewPanorama.';
   }
+
+  /**
+   * Rendering panoramas in a 3D sphere can be configured using the (undocumented) StreetViewPanorama.mode setting.
+   * (see: https://groups.google.com/forum/#!msg/google-maps-js-api-v3/FNP2INYAUpw/LurOZk0bX_EJ)
+   * Possible values are: "html4", "html5", and "webgl". Using "webgl" will cause Rendering in a 3D sphere.
+   * Currently only Chrome is rendering panoramas in a 3D sphere by default. For other browsers this has to be
+   * configured explicitly. By default other browsers are just showing the raw panorama tiles and pan them around.
+   *
+   * @private
+   * @type {function(StreetViewPov, StreetViewPov, number, Element): Object}
+   */
+  this.povToPixel_ = (!!pano && (pano.mode === "webgl" || pano.mode === "html5" || !pano.mode && !!window.chrome)) || (!pano && !!window.chrome) ?
+    PanoMarker.povToPixel3d :
+    PanoMarker.povToPixel2d;
 
   // Remove the marker if it previously was on a panorama
   if (!!this.pano_) {
