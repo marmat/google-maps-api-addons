@@ -85,6 +85,15 @@ var PanoMarker = function(opts) {
   // following won't throw errors.
   opts = opts || {};
 
+  // panorama.getContainer has been deprecated in the Google Maps API. The user
+  // now explicity needs to pass in the container for the panorama.
+  if (opts.panoContainer) {
+    this.panoContainer_ = opts.panoContainer;
+  }
+  else {
+    throw 'A panorama container needs to be defined.';
+  }  
+
   /**
    * Currently only Chrome is rendering panoramas in a 3D sphere. The other
    * browsers are just showing the raw panorama tiles and pan them around.
@@ -141,7 +150,7 @@ var PanoMarker = function(opts) {
   this.zIndex_ = opts.zIndex || 1;
 
   // At last, call some methods which use the initialized parameters
-  this.setPano(opts.pano || null);
+  this.setPano(opts.pano || null, opts.panoContainer);
 };
 
 PanoMarker.prototype = new google.maps.OverlayView();
@@ -422,7 +431,7 @@ PanoMarker.prototype.draw = function() {
   var offset = this.povToPixel_(this.position_,
       this.pano_.getPov(),
       this.pano_.getZoom() !== null ? this.pano_.getZoom() : 1,
-      this.pano_.getContainer());
+      this.panoContainer_);
 
   if (offset !== null) {
     this.marker_.style.left = (offset.left - this.anchor_.x) + 'px';
@@ -560,8 +569,9 @@ PanoMarker.prototype.setId = function(id) {
  *
  * @param {google.maps.StreetViewPanorama} pano The panorama in which to show
  *    the marker.
+ * @param {HTMLDivElement} panoContainer The container holding the panorama.
  */
-PanoMarker.prototype.setPano = function(pano) {
+PanoMarker.prototype.setPano = function(pano, panoContainer) {
   // In contrast to regular OverlayViews, we are disallowing the usage on
   // regular maps
   if (!!pano && !(pano instanceof google.maps.StreetViewPanorama)) {
@@ -576,6 +586,7 @@ PanoMarker.prototype.setPano = function(pano) {
   // Call method from superclass
   this.setMap(pano);
   this.pano_ = pano;
+  this.panoContainer_ = panoContainer;
 
   // Fire the onAdd Event manually as soon as the pano is ready
   if (!!pano) {
