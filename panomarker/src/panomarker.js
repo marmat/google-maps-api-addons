@@ -40,6 +40,7 @@
  * {google.maps.Point} anchor The point (in pixels) to which objects will snap.
  * {string} className The class name which will be assigned to the
  *    created div node.
+ * {HTMLDivElement} container The container holding the panorama.
  * {string} icon URL to an image file that shall be used.
  * {string} id A unique identifier that will be assigned to the
  *    created div-node.
@@ -87,12 +88,12 @@ var PanoMarker = function(opts) {
 
   // panorama.getContainer has been deprecated in the Google Maps API. The user
   // now explicity needs to pass in the container for the panorama.
-  if (opts.panoContainer) {
-    this.panoContainer_ = opts.panoContainer;
-  }
-  else {
+  if (!opts.container) {
     throw 'A panorama container needs to be defined.';
-  }  
+  }
+
+  /** @private @type {HTMLDivElement} */
+  this.container_ = opts.container;
 
   /**
    * Currently only Chrome is rendering panoramas in a 3D sphere. The other
@@ -150,7 +151,7 @@ var PanoMarker = function(opts) {
   this.zIndex_ = opts.zIndex || 1;
 
   // At last, call some methods which use the initialized parameters
-  this.setPano(opts.pano || null, opts.panoContainer);
+  this.setPano(opts.pano || null, opts.container);
 };
 
 PanoMarker.prototype = new google.maps.OverlayView();
@@ -431,7 +432,7 @@ PanoMarker.prototype.draw = function() {
   var offset = this.povToPixel_(this.position_,
       this.pano_.getPov(),
       this.pano_.getZoom() !== null ? this.pano_.getZoom() : 1,
-      this.panoContainer_);
+      this.container_);
 
   if (offset !== null) {
     this.marker_.style.left = (offset.left - this.anchor_.x) + 'px';
@@ -492,7 +493,6 @@ PanoMarker.prototype.getIcon = function() { return this.icon_; };
 
 /** @return {string} The identifier or null if not set upon marker creation. */
 PanoMarker.prototype.getId = function() { return this.id_; };
-
 
 /** @return {google.maps.StreetViewPanorama} The current panorama. */
 PanoMarker.prototype.getPano = function() { return this.pano_; };
@@ -569,9 +569,9 @@ PanoMarker.prototype.setId = function(id) {
  *
  * @param {google.maps.StreetViewPanorama} pano The panorama in which to show
  *    the marker.
- * @param {HTMLDivElement} panoContainer The container holding the panorama.
+ * @param {HTMLDivElement} container The container holding the panorama.
  */
-PanoMarker.prototype.setPano = function(pano, panoContainer) {
+PanoMarker.prototype.setPano = function(pano, container) {
   // In contrast to regular OverlayViews, we are disallowing the usage on
   // regular maps
   if (!!pano && !(pano instanceof google.maps.StreetViewPanorama)) {
@@ -586,7 +586,7 @@ PanoMarker.prototype.setPano = function(pano, panoContainer) {
   // Call method from superclass
   this.setMap(pano);
   this.pano_ = pano;
-  this.panoContainer_ = panoContainer;
+  this.container_ = container;
 
   // Fire the onAdd Event manually as soon as the pano is ready
   if (!!pano) {
