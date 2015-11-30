@@ -125,7 +125,7 @@
           <td></td>
         </tr>
         <tr>
-          <td><code>setPano(pano:<a href="https://developers.google.com/maps/documentation/javascript/reference#StreetViewPanorama">google.maps.StreetViewPanorama</a>)</code></td>
+          <td><code>setPano(pano:<a href="https://developers.google.com/maps/documentation/javascript/reference#StreetViewPanorama">google.maps.StreetViewPanorama</a>, container:HTMLDivElement)</code></td>
           <td><code>None</code></td>
           <td>Renders the marker on the specified panorama. If pano is set to null, the marker will be removed.</td>
         </tr>
@@ -181,6 +181,11 @@
           <th>Events</th>
           <th>Arguments</th>
           <th>Description</th>
+        </tr>
+        <tr>
+          <td><code>add</code></td>
+          <td><code>HTMLDivElement</code></td>
+          <td>This event is fired when the marker has been created and drawn on panorama.</td>
         </tr>
         <tr>
           <td><code>click</code></td>

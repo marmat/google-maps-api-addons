@@ -417,6 +417,9 @@ PanoMarker.prototype.onAdd = function() {
   marker.addEventListener(eventName, this.onClick.bind(this), false);
 
   this.draw();
+
+  // Fire 'add' event once the marker has been created.
+  google.maps.event.trigger(this, 'add', this.marker_);
 };
 
 
