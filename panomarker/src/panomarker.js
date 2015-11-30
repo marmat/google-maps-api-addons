@@ -145,7 +145,7 @@ var PanoMarker = function(opts) {
   this.title_ = opts.title || '';
 
   /** @private @type {boolean} */
-  this.visible_ = opts.visible || true;
+  this.visible_ = (typeof opts.visible === 'boolean') ? opts.visible : true;
 
   /** @private @type {number} */
   this.zIndex_ = opts.zIndex || 1;
