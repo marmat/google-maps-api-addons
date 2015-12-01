@@ -192,6 +192,11 @@
           <td><code><a href="https://developers.google.com/maps/documentation/javascript/reference#MouseEvent">MouseEvent</a></code></td>
           <td>This event is fired when the marker icon was clicked.</td>
         </tr>
+        <tr>
+          <td><code>remove</code></td>
+          <td><code>HTMLDivElement</code></td>
+          <td>This event is fired when the marker has been destroyed and removed from the panorama.</td>
+        </tr>
       </table>
 
       <h2 id="PanoMarkerOptions">PanoMarkerOptions object specification</h2>
@@ -211,6 +216,11 @@
           <td><code>className</code></td>
           <td><code>string<code></td>
           <td>The class name which will be assigned to the created div node.</td>
+        </tr>
+        <tr>
+          <td><code>container</code></td>
+          <td><code>HTMLDivElement<code></td>
+          <td>Container of the panorama.</td>
         </tr>
         <tr>
           <td><code>icon</code></td>

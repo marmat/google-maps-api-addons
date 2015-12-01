@@ -472,6 +472,9 @@ PanoMarker.prototype.onRemove = function() {
   google.maps.event.removeListener(this.zoomListener_);
   this.marker_.parentNode.removeChild(this.marker_);
   this.marker_ = null;
+
+  // Fire 'remove' event once the marker has been destroyed.
+  google.maps.event.trigger(this, 'remove');
 };
 
 
