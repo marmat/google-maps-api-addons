@@ -434,7 +434,7 @@ PanoMarker.prototype.draw = function() {
   // the viewport because it has the actual viewport dimensions.
   var offset = this.povToPixel_(this.position_,
       this.pano_.getPov(),
-      this.pano_.getZoom() !== null ? this.pano_.getZoom() : 1,
+      typeof this.pano_.getZoom() !== 'undefined' ? this.pano_.getZoom() : 1,
       this.container_);
 
   if (offset !== null) {
