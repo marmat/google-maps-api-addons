@@ -57,7 +57,7 @@
   if (typeof module === 'object' && typeof module.exports === 'object') {
     module.exports = factory();
   } else if (typeof define === 'function' && typeof define.amd === 'object') {
-    define(['goog!maps,3,other_params:[sensor=false&libraries=visualization]'],
+    define(['GoogleMaps!'],
       factory);
   } else {
     if (typeof google !== 'object' || typeof google.maps !== 'object') {
