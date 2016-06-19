@@ -1,0 +1,39 @@
+{
+  "name": "google-maps-api-addons",
+  "version": "1.0.0",
+  "description": "A set of useful scripts for the Google Maps API",
+  "main": "panomarker/src/panomarker.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/marmat/google-maps-api-addons.git"
+  },
+  "keywords": [
+    "google",
+    "maps",
+    "api",
+    "plugin",
+    "pano",
+    "panorama",
+    "street",
+    "view",
+    "marker"
+  ],
+  "author": "Martin Matysiak",
+  "contributors": [{
+    "name": "Mark LeMerise",
+    "email": "mark.s.lemerise@gmail.com"
+  }],
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/marmat/google-maps-api-addons/issues"
+  },
+  "homepage": "https://github.com/marmat/google-maps-api-addons",
+  "devDependencies": {
+    "gulp": "^3.8.11",
+    "gulp-rename": "^1.2.0",
+    "gulp-uglify": "^1.1.0"
+  }
+}

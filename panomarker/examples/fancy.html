@@ -21,7 +21,8 @@ var AVAILABLE_PANORAMAS = {
   grid: {
     location: {
       pano: 'grid',
-      description: 'A simple test grid'
+      description: 'A simple test grid',
+      latLng: new google.maps.LatLng(50.5818747, 5.9815603)
     },
     links: [],
     copyright: 'Imagery (c) Martin Matysiak',
@@ -35,7 +36,8 @@ var AVAILABLE_PANORAMAS = {
   gileppe: {
     location: {
       pano: 'gileppe',
-      description: 'Lac de la Gileppe'
+      description: 'Lac de la Gileppe',
+      latLng: new google.maps.LatLng(50.5818747, 5.9815603)
     },
     links: [],
     copyright: 'Imagery (c) Martin Matysiak',
@@ -49,17 +51,20 @@ var AVAILABLE_PANORAMAS = {
 };
 
 function init() {
-  window.panorama = new google.maps.StreetViewPanorama(
-    document.getElementById('map'),
+  var container = document.getElementById('map');
+
+  var panorama = new google.maps.StreetViewPanorama(
+    container,
     {
       pano: 'gileppe',
       pov: {heading: 47.11, pitch: -13.1},
       panoProvider: function(pano) { return AVAILABLE_PANORAMAS[pano]; }
     });
 
-  window.marker = new PanoMarker(
+  var marker = new PanoMarker(
     {
       pano: panorama,
+      container: container,
       position: {heading: 89.63, pitch: -27.22},
       anchor: new google.maps.Point(20,20),
       size: new google.maps.Size(40,40),
@@ -77,8 +82,10 @@ function init() {
     <body onload="init()">
         <div id="map" style="width:620px; height:500px"></div>
         <pre>
+var container = document.getElementById('map');
+
 var panorama = new google.maps.StreetViewPanorama(
-  document.getElementById('map'),
+  container,
   {
     pano: 'gileppe',
     pov: {heading: 47.11, pitch: -13.1},

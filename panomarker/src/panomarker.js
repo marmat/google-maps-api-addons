@@ -19,7 +19,7 @@
  */
 
 /**
- * @license Copyright 2014 Martin Matysiak.
+ * @license Copyright 2014 — 2015 Martin Matysiak.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,6 +40,7 @@
  * {google.maps.Point} anchor The point (in pixels) to which objects will snap.
  * {string} className The class name which will be assigned to the
  *    created div node.
+ * {HTMLDivElement} container The container holding the panorama.
  * {string} icon URL to an image file that shall be used.
  * {string} id A unique identifier that will be assigned to the
  *    created div-node.
@@ -80,9 +81,29 @@
  * @extends google.maps.OverlayView
  */
 var PanoMarker = function(opts) {
+
   // In case no options have been given at all, fallback to {} so that the
   // following won't throw errors.
   opts = opts || {};
+
+  // panorama.getContainer has been deprecated in the Google Maps API. The user
+  // now explicity needs to pass in the container for the panorama.
+  if (!opts.container) {
+    throw 'A panorama container needs to be defined.';
+  }
+
+  /** @private @type {HTMLDivElement} */
+  this.container_ = opts.container;
+
+  /**
+   * Currently only Chrome is rendering panoramas in a 3D sphere. The other
+   * browsers are just showing the raw panorama tiles and pan them around.
+   *
+   * @private
+   * @type {function(StreetViewPov, StreetViewPov, number, Element): Object}
+   */
+  this.povToPixel_ = !!window.chrome ? PanoMarker.povToPixel3d :
+      PanoMarker.povToPixel2d;
 
   /** @private @type {google.maps.Point} */
   this.anchor_ = opts.anchor || new google.maps.Point(16, 16);
@@ -124,23 +145,13 @@ var PanoMarker = function(opts) {
   this.title_ = opts.title || '';
 
   /** @private @type {boolean} */
-  this.visible_ = opts.visible || true;
+  this.visible_ = (typeof opts.visible === 'boolean') ? opts.visible : true;
 
   /** @private @type {number} */
   this.zIndex_ = opts.zIndex || 1;
 
   // At last, call some methods which use the initialized parameters
-  this.setPano(opts.pano || null);
-
-  /**
-   * Currently only Chrome is rendering panoramas in a 3D sphere. The other
-   * browsers are just showing the raw panorama tiles and pan them around.
-   *
-   * @private
-   * @type {function(StreetViewPov, StreetViewPov, number, Element): Object}
-   */
-  this.povToPixel_ = !!window.chrome ? PanoMarker.povToPixel3d :
-      PanoMarker.povToPixel2d;
+  this.setPano(opts.pano || null, opts.container);
 };
 
 PanoMarker.prototype = new google.maps.OverlayView();
@@ -394,14 +405,21 @@ PanoMarker.prototype.onAdd = function() {
   this.zoomListener_ = google.maps.event.addListener(this.getMap(),
       'zoom_changed', this.draw.bind(this));
 
+  var eventName = 'click';
+
   // Make clicks possible
-  if (marker.attachEvent) {
-    marker.attachEvent('onclick', this.onClick.bind(this));
-  } else {
-    marker.addEventListener('click', this.onClick.bind(this), false);
+  if (window.PointerEvent) {
+    eventName = 'pointerdown';
+  } else if (window.MSPointerEvent) {
+    eventName = 'MSPointerDown';
   }
 
+  marker.addEventListener(eventName, this.onClick.bind(this), false);
+
   this.draw();
+
+  // Fire 'add' event once the marker has been created.
+  google.maps.event.trigger(this, 'add', this.marker_);
 };
 
 
@@ -416,8 +434,8 @@ PanoMarker.prototype.draw = function() {
   // the viewport because it has the actual viewport dimensions.
   var offset = this.povToPixel_(this.position_,
       this.pano_.getPov(),
-      this.pano_.getZoom() != null ? this.pano_.getZoom() : 1,
-      this.pano_.getContainer());
+      typeof this.pano_.getZoom() !== 'undefined' ? this.pano_.getZoom() : 1,
+      this.container_);
 
   if (offset !== null) {
     this.marker_.style.left = (offset.left - this.anchor_.x) + 'px';
@@ -454,6 +472,9 @@ PanoMarker.prototype.onRemove = function() {
   google.maps.event.removeListener(this.zoomListener_);
   this.marker_.parentNode.removeChild(this.marker_);
   this.marker_ = null;
+
+  // Fire 'remove' event once the marker has been destroyed.
+  google.maps.event.trigger(this, 'remove');
 };
 
 
@@ -478,7 +499,6 @@ PanoMarker.prototype.getIcon = function() { return this.icon_; };
 
 /** @return {string} The identifier or null if not set upon marker creation. */
 PanoMarker.prototype.getId = function() { return this.id_; };
-
 
 /** @return {google.maps.StreetViewPanorama} The current panorama. */
 PanoMarker.prototype.getPano = function() { return this.pano_; };
@@ -555,8 +575,9 @@ PanoMarker.prototype.setId = function(id) {
  *
  * @param {google.maps.StreetViewPanorama} pano The panorama in which to show
  *    the marker.
+ * @param {HTMLDivElement} container The container holding the panorama.
  */
-PanoMarker.prototype.setPano = function(pano) {
+PanoMarker.prototype.setPano = function(pano, container) {
   // In contrast to regular OverlayViews, we are disallowing the usage on
   // regular maps
   if (!!pano && !(pano instanceof google.maps.StreetViewPanorama)) {
@@ -571,21 +592,29 @@ PanoMarker.prototype.setPano = function(pano) {
   // Call method from superclass
   this.setMap(pano);
   this.pano_ = pano;
+  this.container_ = container;
 
   // Fire the onAdd Event manually as soon as the pano is ready
   if (!!pano) {
-    if (!!this.getPanes()) {
-      this.onAdd();
-    } else {
+    var promiseFn = function(resolve) {
       // Poll for panes to become available
       var pollCallback = function() {
         if (!!this.getPanes()) {
           window.clearInterval(this.pollId_);
           this.onAdd();
+          if (resolve) { resolve(this); }
         }
       };
 
       this.pollId_ = window.setInterval(pollCallback.bind(this), 10);
+    };
+
+    // Best case, the promiseFn can be wrapped in a Promise so the consumer knows when the pano is set
+    // Otherwise just call the function immediately
+    if (typeof Promise !== 'undefined') {
+      return new Promise(promiseFn.bind(this));
+    } else {
+      promiseFn.call(this);
     }
   }
 };
