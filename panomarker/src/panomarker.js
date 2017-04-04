@@ -89,21 +89,11 @@ var PanoMarker = function(opts) {
   // panorama.getContainer has been deprecated in the Google Maps API. The user
   // now explicity needs to pass in the container for the panorama.
   if (!opts.container) {
-    throw 'A panorama container needs to be defined.';
+      throw 'A panorama container needs to be defined.';
   }
 
   /** @private @type {HTMLDivElement} */
   this.container_ = opts.container;
-
-  /**
-   * Currently only Chrome is rendering panoramas in a 3D sphere. The other
-   * browsers are just showing the raw panorama tiles and pan them around.
-   *
-   * @private
-   * @type {function(StreetViewPov, StreetViewPov, number, Element): Object}
-   */
-  this.povToPixel_ = !!window.chrome ? PanoMarker.povToPixel3d :
-      PanoMarker.povToPixel2d;
 
   /** @private @type {google.maps.Point} */
   this.anchor_ = opts.anchor || new google.maps.Point(16, 16);
@@ -149,6 +139,20 @@ var PanoMarker = function(opts) {
 
   /** @private @type {number} */
   this.zIndex_ = opts.zIndex || 1;
+
+  /** Check whether to use 2d or 3d rendering by looking up a canvas in the container and checking its context */
+  this.is3D = function() {
+    var canvasList = this.container_.getElementsByTagName('canvas');
+    if (canvasList.length > 0) {
+      var canvas = canvasList[0];
+      if (canvas && (canvas.getContext("experimental-webgl") || canvas.getContext("webgl"))) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  this.povToPixel_ = this.is3D() ? PanoMarker.povToPixel3d : PanoMarker.povToPixel2d;
 
   // At last, call some methods which use the initialized parameters
   this.setPano(opts.pano || null, opts.container);
@@ -619,13 +623,11 @@ PanoMarker.prototype.setPano = function(pano, container) {
   }
 };
 
-
 /** @param {google.maps.StreetViewPov} position The desired position. */
 PanoMarker.prototype.setPosition = function(position) {
   this.position_ = position;
   this.draw();
 };
-
 
 /** @param {google.maps.Size} size The new size. */
 PanoMarker.prototype.setSize = function(size) {
