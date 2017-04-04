@@ -57,7 +57,7 @@
   if (typeof module === 'object' && typeof module.exports === 'object') {
     module.exports = factory();
   } else if (typeof define === 'function' && typeof define.amd === 'object') {
-    define(['GoogleMaps!'],
+    define(['goog!maps,3,other_params:[sensor=false&libraries=visualization]'],
       factory);
   } else {
     if (typeof google !== 'object' || typeof google.maps !== 'object') {
@@ -139,6 +139,20 @@ var PanoMarker = function(opts) {
 
   /** @private @type {number} */
   this.zIndex_ = opts.zIndex || 1;
+
+  /** Check whether to use 2d or 3d rendering by looking up a canvas in the container and checking its context */
+  this.is3D = function() {
+    var canvasList = this.container_.getElementsByTagName('canvas');
+    if (canvasList.length > 0) {
+      var canvas = canvasList[0];
+      if (canvas && (canvas.getContext("experimental-webgl") || canvas.getContext("webgl"))) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  this.povToPixel_ = this.is3D() ? PanoMarker.povToPixel3d : PanoMarker.povToPixel2d;
 
   // At last, call some methods which use the initialized parameters
   this.setPano(opts.pano || null, opts.container);
@@ -574,20 +588,6 @@ PanoMarker.prototype.setPano = function(pano, container) {
     throw 'PanoMarker only works inside a StreetViewPanorama.';
   }
 
-  /**
-   * Rendering panoramas in a 3D sphere can be configured using the (undocumented) StreetViewPanorama.mode setting.
-   * (see: https://groups.google.com/forum/#!msg/google-maps-js-api-v3/FNP2INYAUpw/LurOZk0bX_EJ)
-   * Possible values are: "html4", "html5", and "webgl". Using "webgl" will cause Rendering in a 3D sphere.
-   * Currently only Chrome is rendering panoramas in a 3D sphere by default. For other browsers this has to be
-   * configured explicitly. By default other browsers are just showing the raw panorama tiles and pan them around.
-   *
-   * @private
-   * @type {function(StreetViewPov, StreetViewPov, number, Element): Object}
-   */
-  this.povToPixel_ = (!!pano && (pano.mode === "webgl" || pano.mode === "html5" || !pano.mode && !!window.chrome)) || (!pano && !!window.chrome) ?
-    PanoMarker.povToPixel3d :
-    PanoMarker.povToPixel2d;
-
   // Remove the marker if it previously was on a panorama
   if (!!this.pano_) {
     this.onRemove();
@@ -623,13 +623,11 @@ PanoMarker.prototype.setPano = function(pano, container) {
   }
 };
 
-
 /** @param {google.maps.StreetViewPov} position The desired position. */
 PanoMarker.prototype.setPosition = function(position) {
   this.position_ = position;
   this.draw();
 };
-
 
 /** @param {google.maps.Size} size The new size. */
 PanoMarker.prototype.setSize = function(size) {
